@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web Developer</title>
+  <link rel="stylesheet" href="popup.css" />
+  <style>
+    /* Make list items clickable */
+    .list-group-item.text-link {
+      cursor: pointer;
+    }
+
+    .list-group-item.text-link.active {
+      background-color: #0d6efd;
+      color: white;
+    }
+  </style>
+</head>
+
+<body class="bg-light p-2">
+  <!-- Category Tabs -->
+  <ul class="nav nav-tabs nav-fill mb-2" id="categoryTabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" data-category="disable" type="button">
+        <img src="icons/disable.svg" alt="Disable" class="tab-icon" /> Disable
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-category="css" type="button">
+        <img src="icons/css.svg" alt="CSS" class="tab-icon" /> CSS
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-category="cookies" type="button">
+        <img src="icons/cookies.svg" alt="Cookies" class="tab-icon" /> Cookies
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-category="forms" type="button">
+        <img src="icons/forms.svg" alt="Forms" class="tab-icon" /> Forms
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-category="images" type="button">
+        <img src="icons/images.svg" alt="Images" class="tab-icon" /> Images
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-category="info" type="button">
+        <img src="icons/information.svg" alt="Info" class="tab-icon" />
+        Information
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-category="outline" type="button">
+        <img src="icons/outline.svg" alt="outline" class="tab-icon" />
+        Outline
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-category="resize" type="button">
+        <img src="icons/resize.svg" alt="resize" class="tab-icon" />
+        Resize
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-category="miscellaneous" type="button">
+        <img src="icons/miscellaneous.svg" alt="miscellaneous" class="tab-icon" />
+        Miscellaneous
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-category="tools" type="button">
+        <img src="icons/tools.svg" alt="tools" class="tab-icon" />
+        Tools
+      </button>
+    </li>
+  </ul>
+
+  <!-- Function panels -->
+  <div id="tabContent">
+    <!-- Disable Features -->
+    <div class="tab-panel" data-category="disable">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item text-link" data-disable="disableJavaScript">
+          Disable JavaScript
+        </li>
+        <li class="list-group-item text-link" data-disable="disableNotifications">
+          Disable Notifications
+        </li>
+        <li class="list-group-item text-link" data-disable="disablePopups">
+          Disable Popups
+        </li>
+        <li class="list-group-item text-link" data-disable="resetAll">
+          Reset Disabled Features
+        </li>
+      </ul>
+    </div>
+
+    <!-- Cookies -->
+    <div class="tab-panel d-none" data-category="cookies">
+      <ul class="list-group list-group-flush" id="cookiesActions">
+        <li class="list-group-item text-link" data-cookies="disableCookies">
+          Disable Cookies
+        </li>
+        <li class="list-group-item text-link" data-cookies="addCookie">
+          Add Cookie...
+        </li>
+        <li class="list-group-item text-link" data-cookies="deleteDomainCookies">
+          Delete Domain Cookies
+        </li>
+        <li class="list-group-item text-link" data-cookies="deletePathCookies">
+          Delete Path Cookies
+        </li>
+        <li class="list-group-item text-link" data-cookies="deleteSessionCookies">
+          Delete Session Cookies
+        </li>
+        <li class="list-group-item text-link" data-cookies="viewCookieInfo">
+          View Cookie Information
+        </li>
+      </ul>
+
+      <!-- Message area -->
+      <div id="cookiesMessage" class="mt-2 p-2 rounded"></div>
+
+      <!-- Add Cookie form (hidden by default) -->
+      <div id="addCookieForm" class="d-none border p-2 rounded mt-2">
+        <h6>Add New Cookie</h6>
+        <input id="cookieName" class="form-control mb-1" placeholder="Name" />
+        <input id="cookieValue" class="form-control mb-1" placeholder="Value" />
+        <input id="cookieDomain" class="form-control mb-1" placeholder="Domain (example.com)" />
+        <input id="cookiePath" class="form-control mb-1" placeholder="Path (default /)" />
+        <div class="d-flex gap-2">
+          <button id="cookieSave" class="btn btn-sm btn-success">Save</button>
+          <button id="cookieCancel" class="btn btn-sm btn-secondary">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CSS Tools -->
+    <div class="tab-panel d-none" data-category="css">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item text-link" data-func="disableAllStyles">
+          Disable All Styles
+        </li>
+        <li class="list-group-item text-link" data-func="disableBrowserDefault">
+          Browser Default
+        </li>
+        <li class="list-group-item text-link" data-func="disableEmbedded">
+          Embedded Styles
+        </li>
+        <li class="list-group-item text-link" data-func="disableInline">
+          Inline Styles
+        </li>
+        <li class="list-group-item text-link" data-func="disableLinked">
+          Linked Sheets
+        </li>
+        <li class="list-group-item text-link" data-func="disablePrint">
+          Print Styles
+        </li>
+        <li class="list-group-item text-link" data-func="displayHandheld">
+          Handheld Styles
+        </li>
+        <li class="list-group-item text-link" data-func="displayPrint">
+          Print Media
+        </li>
+        <li class="list-group-item text-link" data-func="reloadLinked">
+          Reload Sheets
+        </li>
+        <li class="list-group-item text-link" data-func="borderBox">
+          Border Box
+        </li>
+        <li class="list-group-item text-link" data-func="viewCSS">
+          View CSS
+        </li>
+      </ul>
+    </div>
+
+    <!-- Images -->
+    <div class="tab-panel d-none" data-category="images">
+      <ul class="list-group list-group-flush" id="imagesActions">
+        <li class="list-group-item text-link" data-image="disableImages">
+          Disable Images
+        </li>
+        <li class="list-group-item text-link" data-image="hideImages">
+          Hide Images
+        </li>
+        <li class="list-group-item text-link" data-image="hideBackgroundImages">
+          Hide Background Images
+        </li>
+        <li class="list-group-item text-link" data-image="makeImagesFullSize">
+          Make Images Full Size
+        </li>
+        <li class="list-group-item text-link" data-image="makeImagesInvisible">
+          Make Images Invisible
+        </li>
+        <li class="list-group-item text-link" data-image="outlineAllImages">
+          Outline All Images
+        </li>
+        <li class="list-group-item text-link" data-image="outlineBackgroundImages">
+          Outline Background Images
+        </li>
+        <li class="list-group-item text-link" data-image="outlineImagesWithAdjustedDimensions">
+          Outline Images With Adjusted Dimensions
+        </li>
+        <li class="list-group-item text-link" data-image="outlineImagesWithEmptyAltAttributes">
+          Outline Images With Empty Alt Attributes
+        </li>
+        <li class="list-group-item text-link" data-image="outlineImagesWithOversizedDimensions">
+          Outline Images With Oversized Dimensions
+        </li>
+        <li class="list-group-item text-link" data-image="outlineImagesWithoutAltAttributes">
+          Outline Images Without Alt Attributes
+        </li>
+        <li class="list-group-item text-link" data-image="outlineImagesWithoutDimensions">
+          Outline Images Without Dimensions
+        </li>
+        <li class="list-group-item text-link" data-image="displayAltAttributes">
+          Display Alt Attributes
+        </li>
+        <li class="list-group-item text-link" data-image="displayImageDimensions">
+          Display Image Dimensions
+        </li>
+        <li class="list-group-item text-link" data-image="displayImagePaths">
+          Display Image Paths
+        </li>
+        <li class="list-group-item text-link" data-image="replaceImagesWithAltAttributes">
+          Replace Images With Alt Attributes
+        </li>
+        <li class="list-group-item text-link" data-image="viewImageInformation">
+          View Image Information
+        </li>
+      </ul>
+    </div>
+
+    <!-- Info -->
+    <div class="tab-panel d-none" data-category="info">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item text-link" data-info="pageInfo">
+          Page Info
+        </li>
+
+        <li class="list-group-item text-link" data-info="displayAbbreviations">
+          Display Abbreviations
+        </li>
+        <li class="list-group-item text-link" data-info="displayAccessKeys">
+          Display Access Keys
+        </li>
+        <li class="list-group-item text-link" data-info="displayAnchors">
+          Display Anchors
+        </li>
+        <li class="list-group-item text-link" data-info="displayAriaRoles">
+          Display ARIA Roles
+        </li>
+        <li class="list-group-item text-link" data-info="displayDivDimensions">
+          Display Div Dimensions
+        </li>
+        <li class="list-group-item text-link" data-info="displayDivOrder">
+          Display Div Order
+        </li>
+        <li class="list-group-item text-link" data-info="displayElementInformation">
+          Display Element Information
+        </li>
+        <li class="list-group-item text-link" data-info="displayIdClassDetails">
+          Display Id &amp; Class Details
+        </li>
+
+        <li class="list-group-item text-link" data-info="displayLinkDetails">
+          Display Link Details
+        </li>
+        <li class="list-group-item text-link" data-info="displayObjectInformation">
+          Display Object Information
+        </li>
+        <li class="list-group-item text-link" data-info="displayStackLevels">
+          Display Stack Levels
+        </li>
+        <li class="list-group-item text-link" data-info="displayTabIndex">
+          Display Tab Index
+        </li>
+        <li class="list-group-item text-link" data-info="displayTableDepth">
+          Display Table Depth
+        </li>
+        <li class="list-group-item text-link" data-info="displayTableInformation">
+          Display Table Information
+        </li>
+        <li class="list-group-item text-link" data-info="displayTitleAttributes">
+          Display Title Attributes
+        </li>
+        <li class="list-group-item text-link" data-info="displayTopographicInformation">
+          Display Topographic Information
+        </li>
+
+        <li class="list-group-item text-link" data-info="findDuplicateIds">
+          Find Duplicate Ids
+        </li>
+        <li class="list-group-item text-link" data-info="viewAnchorInformation">
+          View Anchor Information
+        </li>
+        <li class="list-group-item text-link" data-info="viewColorInformation">
+          View Color Information
+        </li>
+        <li class="list-group-item text-link" data-info="viewDocumentOutline">
+          View Document Outline
+        </li>
+        <li class="list-group-item text-link" data-info="viewJavaScript">
+          View JavaScript
+        </li>
+        <li class="list-group-item text-link" data-info="viewLinkInformation">
+          View Link Information
+        </li>
+        <li class="list-group-item text-link" data-info="viewMetaTagInformation">
+          View Meta Tag Information
+        </li>
+        <li class="list-group-item text-link" data-info="viewResponseHeaders">
+          View Response Headers
+        </li>
+      </ul>
+    </div>
+
+    <!-- Outline -->
+    <div class="tab-panel d-none" data-category="outline">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item text-link" data-outline="outlineAbsolutePositionedElements">
+          Outline Absolute Positioned Elements
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineBlockLevelElements">
+          Outline Block Level Elements
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineDeprecatedElements">
+          Outline Deprecated Elements
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineExternalLinks">
+          Outline External Links
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineFixedPositionedElements">
+          Outline Fixed Positioned Elements
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineFloatedElements">
+          Outline Floated Elements
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineFrames">
+          Outline Frames
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineHeadings">
+          Outline Headings
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineNonSecureElements">
+          Outline Non-Secure Elements
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineRelativePositionedElements">
+          Outline Relative Positioned Elements
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineTableCaptions">
+          Outline Table Captions
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineTableCells">
+          Outline Table Cells
+        </li>
+        <li class="list-group-item text-link" data-outline="outlineTables">
+          Outline Tables
+        </li>
+        <li class="list-group-item text-link" data-outline="showElementTagNames">
+          Show Element Tag Names
+        </li>
+      </ul>
+    </div>
+
+    <!-- Forms -->
+    <div class="tab-panel d-none" data-category="forms">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item text-link" data-form="checkAllCheckboxes">
+          Check All Checkboxes
+        </li>
+        <li class="list-group-item text-link" data-form="uncheckAllCheckboxes">
+          Uncheck All Checkboxes
+        </li>
+        <li class="list-group-item text-link" data-form="clearFormFields">
+          Clear Form Fields
+        </li>
+        <li class="list-group-item text-link" data-form="clearRadioButtons">
+          Clear Radio Buttons
+        </li>
+        <li class="list-group-item text-link" data-form="convertFormGetsToPosts">
+          Convert Form GETs To POSTs
+        </li>
+        <li class="list-group-item text-link" data-form="convertFormPostsToGets">
+          Convert Form POSTs To GETs
+        </li>
+        <li class="list-group-item text-link" data-form="convertSelectElementsToTextInputs">
+          Convert Select Elements To Text Inputs
+        </li>
+
+        <li class="list-group-item text-link" data-form="convertTextInputsToTextareas">
+          Convert Text Inputs To Textareas
+        </li>
+        <li class="list-group-item text-link" data-form="displayFormDetails">
+          Display Form Details
+        </li>
+        <li class="list-group-item text-link" data-form="displayPasswords">
+          Display Passwords
+        </li>
+        <li class="list-group-item text-link" data-form="enableAutoCompletion">
+          Enable Auto Completion
+        </li>
+        <li class="list-group-item text-link" data-form="enableFormFields">
+          Enable Form Fields
+        </li>
+        <li class="list-group-item text-link" data-form="expandSelectElements">
+          Expand Select Elements
+        </li>
+
+        <li class="list-group-item text-link" data-form="makeFormFieldsWritable">
+          Make Form Fields Writable
+        </li>
+        <li class="list-group-item text-link" data-form="outlineFormFieldsWithoutLabels">
+          Outline Form Fields Without Labels
+        </li>
+        <li class="list-group-item text-link" data-form="populateFormFields">
+          Populate Form Fields
+        </li>
+        <li class="list-group-item text-link" data-form="removeFormValidation">
+          Remove Form Validation
+        </li>
+        <li class="list-group-item text-link" data-form="removeMaximumLengths">
+          Remove Maximum Lengths
+        </li>
+        <li class="list-group-item text-link" data-form="viewFormInformation">
+          View Form Information
+        </li>
+      </ul>
+    </div>
+
+    <!-- Resize -->
+    <div class="tab-panel d-none" data-category="resize">
+      <ul class="list-group list-group-flush" id="resizeActions">
+        <li class="list-group-item text-link" data-resize="displayWindowSize">
+          Display Window Size
+        </li>
+        <li class="list-group-item text-link" data-resize="resizeWindow">
+          Resize Window...
+        </li>
+        <li class="list-group-item text-link" data-resize="resizePreset" data-width="1024" data-height="768">
+          1024x768
+        </li>
+        <li class="list-group-item text-link" data-resize="editResizeDimensions">
+          Edit Resize Dimensions...
+        </li>
+        <li class="list-group-item text-link" data-resize="viewResponsiveLayouts">
+          View Responsive Layouts
+        </li>
+      </ul>
+
+      <!-- ✅ Resize form (hidden by default) -->
+      <div id="resizeForm" class="d-none border p-2 rounded mt-2">
+        <h6 class="mb-2">Resize Current Window</h6>
+
+        <div class="d-flex gap-2 mb-2">
+          <input id="resizeWidth" type="number" class="form-control" placeholder="Width (px)" min="200" />
+          <input id="resizeHeight" type="number" class="form-control" placeholder="Height (px)" min="200" />
+        </div>
+
+        <div class="d-flex gap-2">
+          <button id="resizeApply" class="btn btn-sm btn-primary">Apply</button>
+          <button id="resizeCancel" class="btn btn-sm btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools -->
+    <div class="tab-panel d-none" data-category="tools">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item text-link">Validate CSS</li>
+        <li class="list-group-item text-link">Validate Feed</li>
+        <li class="list-group-item text-link">Validate HTML</li>
+        <li class="list-group-item text-link">Validate Accessibility</li>
+        <li class="list-group-item text-link">Validate Links</li>
+        <li class="list-group-item text-link">Validate Structured Data</li>
+        <li class="list-group-item text-link">View DNS Records</li>
+        <!-- <li class="list-group-item text-link">Edit Tools...</li> -->
+        <li class="list-group-item text-link">Validate Local CSS</li>
+        <li class="list-group-item text-link">Validate Local HTML</li>
+        <li class="list-group-item text-link">View Source</li>
+      </ul>
+    </div>
+
+    <!-- Miscellaneous -->
+    <div class="tab-panel d-none" data-category="miscellaneous">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item text-link">Clear Cache</li>
+        <li class="list-group-item text-link">Clear History</li>
+        <li class="list-group-item text-link">Display Color Picker</li>
+        <li class="list-group-item text-link">Display Hidden Elements</li>
+        <li class="list-group-item text-link">Display Line Guides</li>
+        <li class="list-group-item text-link">Display Ruler</li>
+        <li class="list-group-item text-link">Linearize Page</li>
+        <li class="list-group-item text-link">Make Frames Resizable</li>
+        <li class="list-group-item text-link">Mark All Links Unvisited</li>
+        <li class="list-group-item text-link">Mark All Links Visited</li>
+      </ul>
+    </div>
+    <!-- Clear History Confirm -->
+    <div id="clearHistoryConfirm" class="d-none" style="
+  margin-top:10px;
+  padding:12px;
+  border:1px solid rgba(0,0,0,.15);
+  border-radius:12px;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(0,0,0,.12);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+">
+      <div style="font-weight:600; margin-bottom:8px;">
+        Are you sure you want to clear the history?
+      </div>
+
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button id="clearHistoryCancel" class="btn btn-light">Cancel</button>
+        <button id="clearHistoryConfirmBtn" class="btn btn-danger">Clear</button>
+      </div>
+    </div>
+
+  </div>
+
+  <link rel="stylesheet" href="bootstrap/bootstrap.css" />
+  <script src="bootstrap/bootstrap.js"></script>
+  <script src="js/toolsFunctions.js"></script>
+  <script src="js/miscellaneousFunctions.js"></script>
+  <script type="module" src="js/main.js"></script>
+  <script src="js/tabs.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>

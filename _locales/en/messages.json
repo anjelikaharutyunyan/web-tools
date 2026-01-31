@@ -1,0 +1,142 @@
+{
+    "extensionName": {
+        "message": "Web Developer Tools",
+        "description": "Extension name"
+    },
+    "extensionDescription": {
+        "message": "Developer extension with CSS, Cookies, Images, and more.",
+        "description": "Extension description"
+    },
+    "deleteDomainCookiesMultipleConfirmation": {
+        "message": "Are you sure you want to delete $count$ domain cookies?",
+        "description": "Confirmation message for deleting multiple domain cookies",
+        "placeholders": {
+            "count": {
+                "content": "$1",
+                "example": "5"
+            }
+        }
+    },
+    "deleteDomainCookiesMultipleResult": {
+        "message": "$count$ domain cookies deleted.",
+        "description": "Success message after deleting multiple domain cookies",
+        "placeholders": {
+            "count": {
+                "content": "$1",
+                "example": "5"
+            }
+        }
+    },
+    "deleteDomainCookiesNoneFound": {
+        "message": "There are 0 domain cookies to delete.",
+        "description": "Message when no domain cookies are found"
+    },
+    "deleteDomainCookiesSingleConfirmation": {
+        "message": "Are you sure you want to delete 1 domain cookie?",
+        "description": "Confirmation message for deleting a single domain cookie"
+    },
+    "deleteDomainCookiesSingleResult": {
+        "message": "1 domain cookie deleted.",
+        "description": "Success message after deleting a single domain cookie"
+    },
+    "deletePathCookiesMultipleConfirmation": {
+        "message": "Are you sure you want to delete $count$ path cookies?",
+        "description": "Confirmation message for deleting multiple path cookies",
+        "placeholders": {
+            "count": {
+                "content": "$1",
+                "example": "3"
+            }
+        }
+    },
+    "deletePathCookiesMultipleResult": {
+        "message": "$count$ path cookies deleted.",
+        "description": "Success message after deleting multiple path cookies",
+        "placeholders": {
+            "count": {
+                "content": "$1",
+                "example": "3"
+            }
+        }
+    },
+    "deletePathCookiesNoneFound": {
+        "message": "There are 0 path cookies to delete.",
+        "description": "Message when no path cookies are found"
+    },
+    "deletePathCookiesSingleConfirmation": {
+        "message": "Are you sure you want to delete 1 path cookie?",
+        "description": "Confirmation message for deleting a single path cookie"
+    },
+    "deletePathCookiesSingleResult": {
+        "message": "1 path cookie deleted.",
+        "description": "Success message after deleting a single path cookie"
+    },
+    "deleteSessionCookiesMultipleConfirmation": {
+        "message": "Are you sure you want to delete $count$ session cookies?",
+        "description": "Confirmation message for deleting multiple session cookies",
+        "placeholders": {
+            "count": {
+                "content": "$1",
+                "example": "10"
+            }
+        }
+    },
+    "deleteSessionCookiesMultipleResult": {
+        "message": "$count$ session cookies deleted.",
+        "description": "Success message after deleting multiple session cookies",
+        "placeholders": {
+            "count": {
+                "content": "$1",
+                "example": "10"
+            }
+        }
+    },
+    "deleteSessionCookiesNoneFound": {
+        "message": "There are 0 session cookies to delete.",
+        "description": "Message when no session cookies are found"
+    },
+    "deleteSessionCookiesSingleConfirmation": {
+        "message": "Are you sure you want to delete 1 session cookie?",
+        "description": "Confirmation message for deleting a single session cookie"
+    },
+    "deleteSessionCookiesSingleResult": {
+        "message": "1 session cookie deleted.",
+        "description": "Success message after deleting a single session cookie"
+    },
+    "disableCookiesResult": {
+        "message": "Cookies have been disabled.",
+        "description": "Success message after disabling cookies"
+    },
+    "enableCookiesResult": {
+        "message": "Cookies have been enabled.",
+        "description": "Success message after enabling cookies"
+    },
+    "hostCannotBeLocalhost": {
+        "message": "cannot add cookies on a localhost domain.",
+        "description": "Error message when trying to add cookies on localhost"
+    },
+    "noCookiesFound": {
+        "message": "No cookies found.",
+        "description": "Message when no cookies are found"
+    },
+    "cookieAddedSuccess": {
+        "message": "Cookie added successfully.",
+        "description": "Success message when a cookie is added"
+    },
+    "cookieDeletedSuccess": {
+        "message": "Cookie deleted successfully.",
+        "description": "Success message when a cookie is deleted"
+    },
+    "cookieOperationFailed": {
+        "message": "Cookie operation failed.",
+        "description": "Generic error message for cookie operations"
+    },
+    "confirmationDelete": {
+        "message": "Delete",
+        "description": "Delete button text in confirmation dialog"
+    },
+    "confirmationCancel": {
+        "message": "Cancel",
+        "description": "Cancel button text in confirmation dialog"
+    }
+}

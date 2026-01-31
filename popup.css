@@ -1,0 +1,359 @@
+/* =============================
+   General Styles
+============================= */
+
+body {
+  font-size: 0.75rem;
+  flex-wrap: nowrap;
+  width: 750px;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0.5rem;
+  color: #0d6efd;
+  /* primary blue */
+}
+
+.tab-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* =============================
+   Category Tabs
+============================= */
+
+#categoryTabs .nav-link {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.25rem;
+  min-width: auto;
+  border-radius: 0.25rem;
+  background: none;
+  border: none;
+  color: #0d6efd;
+}
+
+#categoryTabs .nav-link.active {
+  color: black;
+  font-weight: bold;
+  border-top: 1px solid #e9ecef;
+  border-left: 1px solid #e9ecef;
+  border-right: 1px solid #e9ecef;
+  border-radius: 10px 10px 0 0;
+}
+
+#categoryTabs .nav-link:hover {
+  color: #0a58ca;
+  text-decoration: underline;
+}
+
+/* =============================
+   List Items (All tabs)
+============================= */
+
+.list-group-item.text-link {
+  cursor: pointer;
+  user-select: none;
+  color: #0d6efd;
+  font-size: 0.75rem;
+  border: none;
+  border-radius: 0;
+  padding: 0.15rem 0.25rem;
+  margin: 0;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background: none;
+  width: auto;
+  text-align: left;
+}
+
+.list-group-item.text-link:hover {
+  text-decoration: underline;
+}
+
+.list-group-item.text-link.active {
+  color: black;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* =============================
+   CSS Tab - 4 columns
+============================= */
+
+.tab-panel[data-category="css"] .list-group {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 2px;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-panel[data-category="css"] .list-group-item {
+  width: auto;
+}
+
+/* =============================
+   Cookies Tab - 3 columns
+============================= */
+
+.tab-panel[data-category="cookies"] .list-group {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-panel[data-category="cookies"] .list-group-item {
+  width: auto;
+}
+
+.tab-panel[data-category="images"] .list-group {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-panel[data-category="images"] .list-group-item {
+  width: auto;
+}
+
+.tab-panel[data-category="info"] .list-group {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-panel[data-category="info"] .list-group-item {
+  width: auto;
+}
+
+.tab-panel[data-category="outline"] .list-group {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-panel[data-category="outline"] .list-group-item {
+  width: auto;
+}
+
+.tab-panel[data-category="forms"] .list-group {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-panel[data-category="forms"] .list-group-item {
+  width: auto;
+}
+
+
+.tab-panel[data-category="resize"] .list-group {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-panel[data-category="resize"] .list-group-item {
+  width: auto;
+}
+
+.tab-panel[data-category="tools"] .list-group {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-panel[data-category="tools"] .list-group-item {
+  width: auto;
+}
+
+.tab-panel[data-category="miscellaneous"] .list-group {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-panel[data-category="miscellaneous"] .list-group-item {
+  width: auto;
+}
+
+
+/* Add Cookie Form inside panel */
+#addCookieForm {
+  display: block;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+#addCookieForm h6 {
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+  color: #333;
+  font-weight: 600;
+}
+
+#addCookieForm input {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.3rem;
+  border: 1px solid #ced4da;
+  border-radius: 3px;
+  width: 100%;
+  margin-bottom: 0.25rem;
+}
+
+#addCookieForm button {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+}
+
+/* =============================
+   Notification System - Under List Group
+============================= */
+
+.notification-container {
+  margin-top: 4px;
+  width: 100%;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.2;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  min-height: 24px;
+  box-sizing: border-box;
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.notification-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 8px;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-close:hover {
+  opacity: 1;
+}
+
+/* Notification types */
+.notification-success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.notification-danger {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.notification-info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+.notification-warning {
+  background-color: #fff3cd;
+  border-color: #ffeaa7;
+  color: #856404;
+}
+
+/* =============================
+   Disable Tab - 2 columns
+============================= */
+
+.tab-panel[data-category="disable"] .list-group {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-panel[data-category="disable"] .list-group-item:last-child {
+  grid-column: 2 / 3;
+}
+
+/* =============================
+   Other tabs - single column
+============================= */
+
+.tab-panel[data-category="images"],
+.tab-panel[data-category="info"] {
+  display: block;
+}
+
+.tab-panel[data-category="images"] .list-group-item,
+.tab-panel[data-category="info"] .list-group-item {
+  width: auto;
+  margin-bottom: 2px;
+}
+
+/* =============================
+   Scroll & overflow
+============================= */
+
+#tabContent {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}

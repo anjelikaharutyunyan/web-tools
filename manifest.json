@@ -1,0 +1,79 @@
+{
+    "manifest_version": 3,
+    "name": "web tools",
+    "version": "1.122.2",
+    "description": "Developer extension with global cookie control",
+    "default_locale": "en",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "storage",
+        "cookies",
+        "contentSettings",
+        "tabs",
+        "alarms",
+        "notifications",
+        "windows",
+        "browsingData",
+        "history"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "js/background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/cookiesFunctions.js"
+            ],
+            "run_at": "document_idle",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/cssFunctions.js"
+            ],
+            "run_at": "document_end",
+            "all_frames": false
+        }
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icons/main.png",
+            "32": "icons/main.png",
+            "48": "icons/main.png",
+            "128": "icons/main.png"
+        }
+    },
+    "icons": {
+        "16": "icons/main.png",
+        "32": "icons/main.png",
+        "48": "icons/main.png",
+        "128": "icons/main.png"
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline';"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "js/*.js",
+                "icons/*",
+                "_locales/*",
+                "css/*"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
+}
