@@ -1,6 +1,4 @@
 // js/cookiesFunctions.js (FULL)
-// Content script: runs on all pages
-// Uses background service worker to access chrome.cookies + chrome.contentSettings
 
 (function () {
   const MSG_TYPE = "COOKIE_ACTION";
@@ -8,12 +6,10 @@
   // ---------------------------
   // Minimal WebDeveloper namespace
   // ---------------------------
-  var WebDeveloper = window.WebDeveloper || {}; // eslint-disable-line no-redeclare
+  var WebDeveloper = window.WebDeveloper || {}; 
   WebDeveloper.Cookies = WebDeveloper.Cookies || {};
 
-  // ---------------------------
-  // Helpers
-  // ---------------------------
+
   function getPageInfo() {
     try {
       const u = new URL(location.href);

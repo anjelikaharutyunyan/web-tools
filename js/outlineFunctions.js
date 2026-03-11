@@ -47,8 +47,7 @@
   }
 
   // ----------------- helpers -----------------
-  const isReasonableBox = (r, minW, minH) =>
-    r.width >= minW && r.height >= minH;
+  const isReasonableBox = (r, minW, minH) => r.width >= minW && r.height >= minH;
 
   function markOutlined(el, tag) {
     el.classList.add(`${NS}-outline`);
@@ -56,10 +55,12 @@
   }
 
   function unmarkOutlined(tag) {
-    document.querySelectorAll(`[data-${NS}="${tag}"]`).forEach((el) => {
+    const list = document.querySelectorAll(`[data-${NS}="${tag}"]`);
+    list.forEach((el) => {
       el.classList.remove(`${NS}-outline`);
       el.removeAttribute(`data-${NS}`);
     });
+    return list.length;
   }
 
   function scheduleUpdate() {
@@ -95,12 +96,7 @@
       const r = item.el.getBoundingClientRect();
 
       // cheap culling
-      if (
-        r.bottom < 0 ||
-        r.right < 0 ||
-        r.top > innerHeight ||
-        r.left > innerWidth
-      ) {
+      if (r.bottom < 0 || r.right < 0 || r.top > innerHeight || r.left > innerWidth) {
         item.badge.style.display = "none";
         continue;
       }
@@ -112,9 +108,11 @@
   }
 
   function clearTagBadges() {
+    const removed = state.tagBadges.length;
     for (const item of state.tagBadges) item?.badge?.remove();
     state.tagBadges = [];
     maybeRemoveListeners();
+    return removed;
   }
 
   function createTagBadges() {
@@ -132,14 +130,8 @@
       const r = el.getBoundingClientRect();
       if (!isReasonableBox(r, 80, 18)) continue;
 
-      // avoid invisibles quickly
       const cs = getComputedStyle(el);
-      if (
-        cs.display === "none" ||
-        cs.visibility === "hidden" ||
-        Number(cs.opacity) === 0
-      )
-        continue;
+      if (cs.display === "none" || cs.visibility === "hidden" || Number(cs.opacity) === 0) continue;
 
       const badge = document.createElement("div");
       badge.className = `${NS}-badge`;
@@ -153,6 +145,7 @@
     }
 
     scheduleUpdate();
+    return count; // ✅ return how many badges created
   }
 
   // ----------------- selectors by function -----------------
@@ -188,6 +181,8 @@
     ensureStyles();
 
     const all = Array.from(document.querySelectorAll("body *"));
+    let count = 0;
+
     for (const el of all) {
       try {
         const r = el.getBoundingClientRect();
@@ -195,14 +190,18 @@
 
         if (predicate(el)) {
           markOutlined(el, tag);
+          count++;
         }
-      } catch {}
+      } catch { }
     }
+    return count; // ✅ count outlined elements
   }
 
   function outlineSimple(tag, selector) {
     ensureStyles();
-    document.querySelectorAll(selector).forEach((el) => markOutlined(el, tag));
+    const list = document.querySelectorAll(selector);
+    list.forEach((el) => markOutlined(el, tag));
+    return list.length; // ✅ count outlined elements
   }
 
   // ----------------- functions list (ARRAY) -----------------
@@ -210,54 +209,37 @@
     {
       name: "outlineAbsolutePositionedElements",
       apply() {
-        outlineByPredicate(
-          this.name,
-          (el) => getComputedStyle(el).position === "absolute",
-        );
+        return outlineByPredicate(this.name, (el) => getComputedStyle(el).position === "absolute");
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineBlockLevelElements",
       apply() {
-        // Common “block-like” displays
-        const blocky = new Set([
-          "block",
-          "flex",
-          "grid",
-          "list-item",
-          "table",
-          "flow-root",
-        ]);
-        outlineByPredicate(
-          this.name,
-          (el) => blocky.has(getComputedStyle(el).display),
-          [50, 16],
-        );
+        const blocky = new Set(["block", "flex", "grid", "list-item", "table", "flow-root"]);
+        return outlineByPredicate(this.name, (el) => blocky.has(getComputedStyle(el).display), [50, 16]);
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineDeprecatedElements",
       apply() {
-        outlineByPredicate(
-          this.name,
-          (el) => DEPRECATED_TAGS.has(el.tagName.toLowerCase()),
-          [10, 10],
-        );
+        return outlineByPredicate(this.name, (el) => DEPRECATED_TAGS.has(el.tagName.toLowerCase()), [10, 10]);
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineExternalLinks",
       apply() {
         ensureStyles();
+        let count = 0;
+
         document.querySelectorAll("a[href]").forEach((a) => {
           const href = a.getAttribute("href");
           if (!href) return;
@@ -271,159 +253,164 @@
 
           if (url.origin !== location.origin) {
             markOutlined(a, this.name);
+            count++;
           }
         });
+
+        return count;
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineFixedPositionedElements",
       apply() {
-        outlineByPredicate(
-          this.name,
-          (el) => getComputedStyle(el).position === "fixed",
-        );
+        return outlineByPredicate(this.name, (el) => getComputedStyle(el).position === "fixed");
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineFloatedElements",
       apply() {
-        outlineByPredicate(this.name, (el) => {
+        return outlineByPredicate(this.name, (el) => {
           const f = getComputedStyle(el).float;
           return f && f !== "none";
         });
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineFrames",
       apply() {
-        outlineSimple(this.name, "iframe, frame, frameset");
+        return outlineSimple(this.name, "iframe, frame, frameset");
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineHeadings",
       apply() {
-        outlineSimple(this.name, "h1,h2,h3,h4,h5,h6");
+        return outlineSimple(this.name, "h1,h2,h3,h4,h5,h6");
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineNonSecureElements",
       apply() {
-        // mixed content: http resources on https page
         const isHttps = location.protocol === "https:";
-        outlineByPredicate(
+        return outlineByPredicate(
           this.name,
           (el) => {
             if (!isHttps) return false;
             const src = el.getAttribute?.("src");
             const href = el.getAttribute?.("href");
             const v = src || href;
-            return (
-              typeof v === "string" &&
-              v.trim().toLowerCase().startsWith("http://")
-            );
+            return typeof v === "string" && v.trim().toLowerCase().startsWith("http://");
           },
           [20, 10],
         );
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineRelativePositionedElements",
       apply() {
-        outlineByPredicate(
-          this.name,
-          (el) => getComputedStyle(el).position === "relative",
-        );
+        return outlineByPredicate(this.name, (el) => getComputedStyle(el).position === "relative");
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineTableCaptions",
       apply() {
-        outlineSimple(this.name, "caption");
+        return outlineSimple(this.name, "caption");
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineTableCells",
       apply() {
-        outlineSimple(this.name, "td, th");
+        return outlineSimple(this.name, "td, th");
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "outlineTables",
       apply() {
-        outlineSimple(this.name, "table");
+        return outlineSimple(this.name, "table");
       },
       revert() {
-        unmarkOutlined(this.name);
+        return unmarkOutlined(this.name);
       },
     },
     {
       name: "showElementTagNames",
       apply() {
-        // This one shows badges (not only outlines)
-        createTagBadges();
+        return createTagBadges();
       },
       revert() {
-        clearTagBadges();
+        return clearTagBadges();
       },
     },
   ];
 
-  const outlineFunctionsMap = new Map(
-    outlineFunctionList.map((f) => [f.name, f]),
-  );
+  const outlineFunctionsMap = new Map(outlineFunctionList.map((f) => [f.name, f]));
 
-  // ----------------- PUBLIC API (like informationFunctions) -----------------
+  // ----------------- PUBLIC API -----------------
   window.outlineFunctions = {
     apply(name) {
       const fn = outlineFunctionsMap.get(name);
-      if (!fn) return null;
-      fn.apply();
+      if (!fn) return { ok: false, message: `Unknown function: ${name}`, count: 0 };
+
+      const count = Number(fn.apply?.() ?? 0) || 0;
       state.applied.add(name);
-      return true;
+
+      if (count === 0) {
+        // if nothing outlined, consider it "not applied"
+        state.applied.delete(name);
+        return { ok: false, message: "No matching elements found", count: 0 };
+      }
+
+      return { ok: true, message: "Applied", count };
     },
+
     revert(name) {
       const fn = outlineFunctionsMap.get(name);
-      if (!fn) return null;
-      fn.revert();
+      if (!fn) return { ok: false, message: `Unknown function: ${name}`, count: 0 };
+
+      const count = Number(fn.revert?.() ?? 0) || 0;
       state.applied.delete(name);
-      return true;
+
+      // Revert can be "ok" even when count=0 (it just means nothing was applied before)
+      return { ok: true, message: count ? "Reverted" : "Nothing to revert", count };
     },
+
     revertAll() {
+      let total = 0;
       for (const n of Array.from(state.applied)) {
         try {
-          outlineFunctionsMap.get(n)?.revert();
-        } catch {}
+          const fn = outlineFunctionsMap.get(n);
+          total += Number(fn?.revert?.() ?? 0) || 0;
+        } catch { }
       }
       state.applied.clear();
-      // ensure badges gone
-      clearTagBadges();
+      total += clearTagBadges();
+      return { ok: true, message: "Reverted all", count: total };
     },
   };
 })();

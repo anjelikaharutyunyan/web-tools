@@ -47,7 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     await showWinInfo();
                 } catch (e) {
-                    console.error(e);
                     winInfo.textContent = "Failed (check permissions: tabs, windows)";
                 }
             });

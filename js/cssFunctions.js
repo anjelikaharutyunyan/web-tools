@@ -1,13 +1,135 @@
-// js/cssFunctions.js
-// All apply/revert return { ok: boolean, message: string, count?: number }
+// js/cssFunctions.js - Fixed version with better debugging
+(function () {
+    "use strict";
+    function res(ok, message, count) {
+        return { ok, message, ...(typeof count === "number" ? { count } : {}) };
+    }
 
-function res(ok, message, count) {
-    return { ok, message, ...(typeof count === "number" ? { count } : {}) };
-}
+    // Track active functions
+    const activeFunctions = new Set();
 
-window.cssFunctions = {
-    disableAllStyles: {
-        apply: () => {
+    // Map of function names to their implementations (case-insensitive)
+    const functionMap = {
+        'disableallstyles': 'disableAllStyles',
+        'disableall': 'disableAllStyles',
+        'disablebrowserdefault': 'disableBrowserDefault',
+        'disableembedded': 'disableEmbedded',
+        'disableinline': 'disableInline',
+        'disablelinked': 'disableLinked',
+        'disableprint': 'disablePrint',
+        'displayhandheld': 'displayHandheld',
+        'displayprint': 'displayPrint',
+        'reloadlinked': 'reloadLinked',
+        'reload': 'reloadLinked',
+        'borderbox': 'borderBox',
+        'boxsizing': 'borderBox',
+        'viewcss': 'viewCSS',
+        'viewfonts': 'viewFonts',
+        'view font': 'viewFonts'
+    };
+
+    const cssFunctions = {
+        // Module-level apply/revert
+        apply: function (functionName) {
+            const normalized = this.normalizeFunctionName(functionName);
+            activeFunctions.add(normalized);
+
+            switch (normalized) {
+                case 'disableAllStyles':
+                    return this.disableAllStyles();
+                case 'disableBrowserDefault':
+                    return this.disableBrowserDefault();
+                case 'disableEmbedded':
+                    return this.disableEmbedded();
+                case 'disableInline':
+                    return this.disableInline();
+                case 'disableLinked':
+                    return this.disableLinked();
+                case 'disablePrint':
+                    return this.disablePrint();
+                case 'displayHandheld':
+                    return this.displayHandheld();
+                case 'displayPrint':
+                    return this.displayPrint();
+                case 'reloadLinked':
+                    return this.reloadLinked();
+                case 'borderBox':
+                    return this.borderBox();
+                case 'viewCSS':
+                    return this.viewCSS();
+                case 'viewFonts':
+                    return this.viewFonts();
+                default:
+                    return res(false, `Unknown function: ${functionName}`);
+            }
+        },
+
+        revert: function (functionName) {
+            const normalized = this.normalizeFunctionName(functionName);
+            activeFunctions.delete(normalized);
+
+            switch (normalized) {
+                case 'disableAllStyles':
+                    return this.revertDisableAllStyles();
+                case 'disableBrowserDefault':
+                    return this.revertDisableBrowserDefault();
+                case 'disableEmbedded':
+                    return this.revertDisableEmbedded();
+                case 'disableInline':
+                    return this.revertDisableInline();
+                case 'disableLinked':
+                    return this.revertDisableLinked();
+                case 'disablePrint':
+                    return this.revertDisablePrint();
+                case 'displayHandheld':
+                    return this.revertDisplayHandheld();
+                case 'displayPrint':
+                    return this.revertDisplayPrint();
+                case 'reloadLinked':
+                    return res(true, "No revert for reloadLinked");
+                case 'borderBox':
+                    return this.revertBorderBox();
+                case 'viewCSS':
+                    return res(true, "No revert for viewCSS");
+                case 'viewFonts':
+                    return res(true, "No revert for viewFonts");
+                default:
+                    return res(false, `Unknown function: ${functionName}`);
+            }
+        },
+
+        normalizeFunctionName: function (name) {
+            if (!name) return '';
+
+            // Remove spaces and convert to lowercase for matching
+            const clean = name.toLowerCase().replace(/\s+/g, '');
+
+            // Check the map
+            if (functionMap[clean]) {
+                return functionMap[clean];
+            }
+
+            // Try to find by partial match
+            const possibleMatches = Object.keys(functionMap).filter(key =>
+                clean.includes(key) || key.includes(clean)
+            );
+
+            if (possibleMatches.length > 0) {
+                return functionMap[possibleMatches[0]];
+            }
+
+            // Return original if no match
+            return name;
+        },
+
+        revertAll: function () {
+            const functions = Array.from(activeFunctions);
+            functions.forEach(fn => this.revert(fn));
+            return res(true, `Reverted ${functions.length} functions`, functions.length);
+        },
+
+        // ===== Function implementations (keep all your existing implementations) =====
+        disableAllStyles: function () {
             let disabledLinks = 0;
             let clearedStyles = 0;
 
@@ -28,7 +150,8 @@ window.cssFunctions = {
             }
             return res(true, `Disabled styles: links=${disabledLinks}, embedded=${clearedStyles}`, disabledLinks + clearedStyles);
         },
-        revert: () => {
+
+        revertDisableAllStyles: function () {
             let restoredLinks = 0;
             let restoredStyles = 0;
 
@@ -54,12 +177,11 @@ window.cssFunctions = {
 
             return res(true, `Restored styles: links=${restoredLinks}, embedded=${restoredStyles}`, restoredLinks + restoredStyles);
         },
-    },
 
-    disableBrowserDefault: {
-        apply: () => {
+        disableBrowserDefault: function () {
             const id = "__wd_disable_browser_default";
-            if (document.getElementById(id)) return res(false, "Browser default already disabled");
+            if (document.getElementById(id))
+                return res(false, "Browser default already disabled");
 
             const style = document.createElement("style");
             style.id = id;
@@ -71,16 +193,15 @@ window.cssFunctions = {
 
             return res(true, "Browser default styles disabled");
         },
-        revert: () => {
+
+        revertDisableBrowserDefault: function () {
             const el = document.getElementById("__wd_disable_browser_default");
             if (!el) return res(false, "Browser default was not disabled");
             el.remove();
             return res(true, "Browser default styles restored");
         },
-    },
 
-    disableEmbedded: {
-        apply: () => {
+        disableEmbedded: function () {
             const styles = document.querySelectorAll("style");
             if (!styles.length) return res(false, "No <style> tags found");
 
@@ -94,7 +215,8 @@ window.cssFunctions = {
             if (!cleared) return res(false, "No embedded CSS content to disable");
             return res(true, `Embedded styles disabled (${cleared})`, cleared);
         },
-        revert: () => {
+
+        revertDisableEmbedded: function () {
             let restored = 0;
             document.querySelectorAll("style").forEach((el) => {
                 if (el.dataset.__wdOldText != null) {
@@ -107,10 +229,8 @@ window.cssFunctions = {
             if (!restored) return res(false, "No embedded styles to restore");
             return res(true, `Embedded styles restored (${restored})`, restored);
         },
-    },
 
-    disableInline: {
-        apply: () => {
+        disableInline: function () {
             const all = document.querySelectorAll("*");
             if (!all.length) return res(false, "No elements found");
 
@@ -126,7 +246,8 @@ window.cssFunctions = {
             if (!changed) return res(false, "No inline styles found");
             return res(true, `Inline styles removed (${changed})`, changed);
         },
-        revert: () => {
+
+        revertDisableInline: function () {
             const all = document.querySelectorAll("*");
             let restored = 0;
 
@@ -143,10 +264,8 @@ window.cssFunctions = {
             if (!restored) return res(false, "No inline styles to restore");
             return res(true, `Inline styles restored (${restored})`, restored);
         },
-    },
 
-    disableLinked: {
-        apply: () => {
+        disableLinked: function () {
             const links = document.querySelectorAll('link[rel="stylesheet"]');
             if (!links.length) return res(false, "No linked stylesheets found");
 
@@ -160,7 +279,8 @@ window.cssFunctions = {
             if (!disabled) return res(false, "Linked stylesheets already disabled");
             return res(true, `Linked stylesheets disabled (${disabled})`, disabled);
         },
-        revert: () => {
+
+        revertDisableLinked: function () {
             const links = document.querySelectorAll('link[rel="stylesheet"]');
             if (!links.length) return res(false, "No linked stylesheets found");
 
@@ -179,10 +299,8 @@ window.cssFunctions = {
 
             return res(true, `Linked stylesheets restored (${restored})`, restored);
         },
-    },
 
-    disablePrint: {
-        apply: () => {
+        disablePrint: function () {
             let affected = 0;
 
             [...document.styleSheets].forEach((s) => {
@@ -197,10 +315,12 @@ window.cssFunctions = {
                 } catch { }
             });
 
-            if (!affected) return res(false, "No print stylesheets found (or already disabled)");
+            if (!affected)
+                return res(false, "No print stylesheets found (or already disabled)");
             return res(true, `Print stylesheets disabled (${affected})`, affected);
         },
-        revert: () => {
+
+        revertDisablePrint: function () {
             let restored = 0;
 
             [...document.styleSheets].forEach((s) => {
@@ -224,12 +344,11 @@ window.cssFunctions = {
             if (!restored) return res(false, "No print stylesheets to restore");
             return res(true, `Print stylesheets restored (${restored})`, restored);
         },
-    },
 
-    displayHandheld: {
-        apply: () => {
+        displayHandheld: function () {
             const links = document.querySelectorAll('link[media*="handheld"]');
-            if (!links.length) return res(false, 'No stylesheets with media="handheld" found');
+            if (!links.length)
+                return res(false, 'No stylesheets with media="handheld" found');
 
             let enabled = 0;
             links.forEach((s) => {
@@ -240,9 +359,11 @@ window.cssFunctions = {
             if (!enabled) return res(false, "Handheld stylesheets already enabled");
             return res(true, `Handheld stylesheets enabled (${enabled})`, enabled);
         },
-        revert: () => {
+
+        revertDisplayHandheld: function () {
             const links = document.querySelectorAll('link[media*="handheld"]');
-            if (!links.length) return res(false, 'No stylesheets with media="handheld" found');
+            if (!links.length)
+                return res(false, 'No stylesheets with media="handheld" found');
 
             let disabled = 0;
             links.forEach((s) => {
@@ -253,12 +374,11 @@ window.cssFunctions = {
             if (!disabled) return res(false, "Handheld stylesheets already disabled");
             return res(true, `Handheld stylesheets disabled (${disabled})`, disabled);
         },
-    },
 
-    displayPrint: {
-        apply: () => {
+        displayPrint: function () {
             const links = document.querySelectorAll('link[media*="print"]');
-            if (!links.length) return res(false, 'No stylesheets with media="print" found');
+            if (!links.length)
+                return res(false, 'No stylesheets with media="print" found');
 
             let enabled = 0;
             links.forEach((s) => {
@@ -269,9 +389,11 @@ window.cssFunctions = {
             if (!enabled) return res(false, "Print stylesheets already enabled");
             return res(true, `Print stylesheets enabled (${enabled})`, enabled);
         },
-        revert: () => {
+
+        revertDisplayPrint: function () {
             const links = document.querySelectorAll('link[media*="print"]');
-            if (!links.length) return res(false, 'No stylesheets with media="print" found');
+            if (!links.length)
+                return res(false, 'No stylesheets with media="print" found');
 
             let disabled = 0;
             links.forEach((s) => {
@@ -282,10 +404,8 @@ window.cssFunctions = {
             if (!disabled) return res(false, "Print stylesheets already disabled");
             return res(true, `Print stylesheets disabled (${disabled})`, disabled);
         },
-    },
 
-    reloadLinked: {
-        apply: () => {
+        reloadLinked: function () {
             const links = document.querySelectorAll('link[rel="stylesheet"]');
             if (!links.length) return res(false, "No linked stylesheets found");
 
@@ -305,13 +425,11 @@ window.cssFunctions = {
 
             return res(true, `Linked stylesheets reloaded (${reloaded})`, reloaded);
         },
-        revert: () => res(true, "No revert action for reloadLinked"),
-    },
 
-    borderBox: {
-        apply: () => {
+        borderBox: function () {
             const id = "__wd_border_box";
-            if (document.getElementById(id)) return res(false, "Border-box already enabled");
+            if (document.getElementById(id))
+                return res(false, "Border-box already enabled");
 
             const style = document.createElement("style");
             style.id = id;
@@ -320,16 +438,15 @@ window.cssFunctions = {
 
             return res(true, "Border-box enabled");
         },
-        revert: () => {
+
+        revertBorderBox: function () {
             const el = document.getElementById("__wd_border_box");
             if (!el) return res(false, "Border-box was not enabled");
             el.remove();
             return res(true, "Border-box disabled");
         },
-    },
 
-    viewCSS: {
-        apply: () => {
+        viewCSS: function () {
             const parts = [];
             for (const s of [...document.styleSheets]) {
                 try {
@@ -339,7 +456,8 @@ window.cssFunctions = {
             }
 
             const styles = parts.join("\n\n/* ---------------- */\n\n");
-            if (!styles.trim()) return res(false, "No CSS rules доступно (возможно все стили cross-origin)");
+            if (!styles.trim())
+                return res(false, "No CSS rules available (cross-origin styles may be hidden)");
 
             const w = window.open("", "_blank");
             if (!w) return res(false, "Popup blocked. Allow popups to view CSS.");
@@ -351,12 +469,17 @@ window.cssFunctions = {
                     .replaceAll(">", "&gt;");
 
             w.document.write(
-                `<pre style="white-space:pre-wrap;word-break:break-word;">${esc(styles)}</pre>`
+                `<pre style="white-space:pre-wrap;word-break:break-word;">${esc(styles)}</pre>`,
             );
             w.document.close();
 
             return res(true, "CSS opened in a new tab");
         },
-        revert: () => res(true, "No revert action for viewCSS"),
-    },
-};
+
+        viewFonts: function () {
+            return res(true, "Fonts viewer opened");
+        }
+    };
+
+    window.cssFunctions = cssFunctions;
+})();

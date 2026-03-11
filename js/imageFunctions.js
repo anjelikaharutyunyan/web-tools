@@ -1,44 +1,36 @@
-// js/imageFunctions.js (FULL fixed + status results)
-// Returns { ok, message, count } for every action
-
+// js/imageFunctions.js - Fixed version that properly tracks state
 (function () {
     "use strict";
 
     const res = (ok, message, count = 0) => ({ ok, message, count });
 
+    // Singleton check
+    if (window.imageFunctions && typeof window.imageFunctions.apply === "function") {
+        return;
+    }
+
     class ImageFunctions {
         constructor() {
-            // Separate storage:
-            // - imgStates: Map<img, state>
-            // - elStates: Map<Element, state> for background/outline changes
             this.imgStates = new Map();
             this.elStates = new Map();
-
-            // track which functions are currently applied
-            this.applied = new Set();
+            this.applied = new Set(); // Track which functions are active
         }
 
         // ---------- helpers ----------
         trackImg(img) {
             if (!this.imgStates.has(img)) {
                 this.imgStates.set(img, {
-                    styleAttr: img.getAttribute("style") || "",
-
-                    // wrappers/overlays created by extension
+                    styleAttr: img.getAttribute("style"),
                     wrap: null,
-                    overlays: {
-                        alt: null,
-                        dims: null,
-                        path: null,
-                    },
-
-                    // disableImages wrapper
+                    overlays: { alt: null, dims: null, path: null },
                     disableWrap: null,
                     disableOverlay: null,
                     disableListeners: null,
-
-                    // replaceImages
-                    originalSrc: img.currentSrc || img.src,
+                    original: {
+                        src: img.getAttribute("src"),
+                        srcset: img.getAttribute("srcset"),
+                        sizes: img.getAttribute("sizes"),
+                    },
                 });
             }
             return this.imgStates.get(img);
@@ -46,25 +38,27 @@
 
         trackElement(el) {
             if (!this.elStates.has(el)) {
-                this.elStates.set(el, {
-                    styleAttr: el.getAttribute("style") || "",
-                });
+                this.elStates.set(el, { styleAttr: el.getAttribute("style") });
             }
             return this.elStates.get(el);
         }
 
-        // Creates a wrapper around img to safely position overlays.
+        restoreStyleAttr(node, originalStyleAttr) {
+            if (!node || !node.isConnected) return;
+            if (originalStyleAttr === null) node.removeAttribute("style");
+            else node.setAttribute("style", originalStyleAttr);
+        }
+
         ensureWrap(img) {
             const state = this.trackImg(img);
             if (state.wrap && state.wrap.isConnected) return state.wrap;
 
+            const parent = img.parentNode;
+            if (!parent) return null;
+
             const wrap = document.createElement("span");
             wrap.className = "__wd_img_wrap";
             wrap.style.cssText = "position:relative; display:inline-block; line-height:0;";
-
-            // insert wrapper
-            const parent = img.parentNode;
-            if (!parent) return null;
 
             parent.insertBefore(wrap, img);
             wrap.appendChild(img);
@@ -76,164 +70,239 @@
         removeWrapIfEmpty(img) {
             const state = this.imgStates.get(img);
             if (!state?.wrap) return;
-            const wrap = state.wrap;
-            const hasAnyOverlay =
-                !!state.overlays.alt || !!state.overlays.dims || !!state.overlays.path;
 
-            // If wrap exists only for overlays and no overlays remain -> unwrap.
+            const wrap = state.wrap;
+            const hasAnyOverlay = !!state.overlays.alt || !!state.overlays.dims || !!state.overlays.path;
+
             if (!hasAnyOverlay && wrap.isConnected) {
                 wrap.replaceWith(img);
                 state.wrap = null;
             }
         }
 
-        // ---------- public API ----------
+        // ==================== PUBLIC API FOR MAIN.JS ====================
+
+        /**
+         * Apply a function (called when button is toggled ON)
+         */
         apply(functionName) {
             this.applied.add(functionName);
-
-            switch (functionName) {
-                case "disableImages":
-                    return this.disableImages();
-                case "hideImages":
-                    return this.hideImages();
-                case "hideBackgroundImages":
-                    return this.hideBackgroundImages();
-                case "makeImagesFullSize":
-                    return this.makeImagesFullSize();
-                case "makeImagesInvisible":
-                    return this.makeImagesInvisible();
-                case "outlineAllImages":
-                    return this.outlineAllImages();
-                case "outlineBackgroundImages":
-                    return this.outlineBackgroundImages();
-                case "outlineImagesWithAdjustedDimensions":
-                    return this.outlineImagesWithAdjustedDimensions();
-                case "outlineImagesWithEmptyAltAttributes":
-                    return this.outlineImagesWithEmptyAltAttributes();
-                case "outlineImagesWithOversizedDimensions":
-                    return this.outlineImagesWithOversizedDimensions();
-                case "outlineImagesWithoutAltAttributes":
-                    return this.outlineImagesWithoutAltAttributes();
-                case "outlineImagesWithoutDimensions":
-                    return this.outlineImagesWithoutDimensions();
-                case "displayAltAttributes":
-                    return this.displayAltAttributes();
-                case "displayImageDimensions":
-                    return this.displayImageDimensions();
-                case "displayImagePaths":
-                    return this.displayImagePaths();
-                case "replaceImagesWithAltAttributes":
-                    return this.replaceImagesWithAltAttributes();
-                case "viewImageInformation":
-                    return this.viewImageInformation();
-                default:
-                    return res(false, `Unknown image function: ${functionName}`, 0);
-            }
+            return this._applyInternal(functionName);
         }
 
+        /**
+         * Revert a function (called when button is toggled OFF)
+         */
         revert(functionName) {
             this.applied.delete(functionName);
 
+            // For revert, we need to clean up everything and reapply remaining functions
+            return this._recomputeAfterRevert(functionName);
+        }
+
+        /**
+         * Revert all functions (for reset)
+         */
+        revertAll() {
+            this.applied.clear();
+            return this._fullCleanup();
+        }
+
+        // ==================== INTERNAL IMPLEMENTATION ====================
+
+        /**
+         * Clean up everything and reapply remaining functions after revert
+         */
+        _recomputeAfterRevert(revertedFunction) {
+            // 1. Full cleanup of all effects
+            this._fullCleanup();
+
+            // 2. Reapply all remaining active functions in correct order
+            return this._reapplyAll(`Reverted: ${revertedFunction}`);
+        }
+
+        /**
+         * Full cleanup - removes ALL effects
+         */
+        _fullCleanup() {
+            // Remove disableImages style
+            document.getElementById("__wd_disable_images_style")?.remove();
+
+            // Remove info modal if open
+            document.getElementById("__wd_image_info_modal")?.remove();
+
+            // Restore all images
+            document.querySelectorAll("img").forEach((img) => {
+                const st = this.imgStates.get(img);
+                if (!st) return;
+
+                // Restore inline styles
+                this.restoreStyleAttr(img, st.styleAttr);
+
+                // Remove disableImages wrappers/listeners
+                if (st.disableListeners) {
+                    st.disableListeners.forEach(({ t, h }) => img.removeEventListener(t, h, true));
+                    st.disableListeners = null;
+                }
+
+                if (st.disableWrap && st.disableWrap.isConnected) {
+                    st.disableWrap.replaceWith(img);
+                }
+                st.disableWrap = null;
+                st.disableOverlay = null;
+
+                // Remove overlays
+                ["alt", "dims", "path"].forEach((k) => {
+                    if (st.overlays[k]?.isConnected) {
+                        st.overlays[k].remove();
+                        st.overlays[k] = null;
+                    }
+                });
+
+                // Remove wrap if empty
+                if (st.wrap && st.wrap.isConnected) {
+                    const hasOverlay = st.overlays.alt || st.overlays.dims || st.overlays.path;
+                    if (!hasOverlay) {
+                        st.wrap.replaceWith(img);
+                        st.wrap = null;
+                    }
+                }
+
+                // Restore original src/srcset/sizes
+                if (st.original) {
+                    const { src, srcset, sizes } = st.original;
+                    if (src === null) img.removeAttribute("src");
+                    else img.setAttribute("src", src);
+                    if (srcset === null) img.removeAttribute("srcset");
+                    else img.setAttribute("srcset", srcset);
+                    if (sizes === null) img.removeAttribute("sizes");
+                    else img.setAttribute("sizes", sizes);
+                }
+            });
+
+            // Restore all elements
+            this.elStates.forEach((st, el) => {
+                if (el?.isConnected) {
+                    this.restoreStyleAttr(el, st.styleAttr);
+                }
+            });
+        }
+
+        /**
+         * Reapply all active functions in correct order
+         */
+        _reapplyAll(message = "Reapplied") {
+            // Define execution order
+            const order = [
+                "disableImages",
+                "hideImages",
+                "hideBackgroundImages",
+                "makeImagesFullSize",
+                "makeImagesInvisible",
+                "outlineAllImages",
+                "outlineBackgroundImages",
+                "outlineImagesWithAdjustedDimensions",
+                "outlineImagesWithEmptyAltAttributes",
+                "outlineImagesWithOversizedDimensions",
+                "outlineImagesWithoutAltAttributes",
+                "outlineImagesWithoutDimensions",
+                "displayAltAttributes",
+                "displayImageDimensions",
+                "displayImagePaths",
+                "replaceImagesWithAltAttributes",
+            ];
+
+            let appliedCount = 0;
+            for (const fn of order) {
+                if (!this.applied.has(fn)) continue;
+                try {
+                    const result = this._applyInternal(fn);
+                    if (result?.ok === false) {
+                        this.applied.delete(fn);
+                    } else {
+                        appliedCount++;
+                    }
+                } catch (e) {
+                    this.applied.delete(fn);
+                }
+            }
+
+            return res(true, `${message}. Active: ${this.applied.size}`, appliedCount);
+        }
+
+        /**
+         * Internal apply - executes a single function
+         */
+        _applyInternal(functionName) {
+
             switch (functionName) {
                 case "disableImages":
-                    return this.revertDisableImages();
+                    return this._disableImages();
                 case "hideImages":
-                case "makeImagesFullSize":
-                case "makeImagesInvisible":
-                case "outlineAllImages":
-                case "outlineImagesWithAdjustedDimensions":
-                case "outlineImagesWithEmptyAltAttributes":
-                case "outlineImagesWithOversizedDimensions":
-                case "outlineImagesWithoutAltAttributes":
-                case "outlineImagesWithoutDimensions":
-                    return this.restoreImgStyles();
+                    return this._hideImages();
                 case "hideBackgroundImages":
+                    return this._hideBackgroundImages();
+                case "makeImagesFullSize":
+                    return this._makeImagesFullSize();
+                case "makeImagesInvisible":
+                    return this._makeImagesInvisible();
+                case "outlineAllImages":
+                    return this._outlineAllImages();
                 case "outlineBackgroundImages":
-                    return this.restoreElementStyles();
+                    return this._outlineBackgroundImages();
+                case "outlineImagesWithAdjustedDimensions":
+                    return this._outlineImagesWithAdjustedDimensions();
+                case "outlineImagesWithEmptyAltAttributes":
+                    return this._outlineImagesWithEmptyAltAttributes();
+                case "outlineImagesWithOversizedDimensions":
+                    return this._outlineImagesWithOversizedDimensions();
+                case "outlineImagesWithoutAltAttributes":
+                    return this._outlineImagesWithoutAltAttributes();
+                case "outlineImagesWithoutDimensions":
+                    return this._outlineImagesWithoutDimensions();
                 case "displayAltAttributes":
-                    return this.removeOverlay("alt");
+                    return this._displayAltAttributes();
                 case "displayImageDimensions":
-                    return this.removeOverlay("dims");
+                    return this._displayImageDimensions();
                 case "displayImagePaths":
-                    return this.removeOverlay("path");
+                    return this._displayImagePaths();
                 case "replaceImagesWithAltAttributes":
-                    return this.restoreOriginalImages();
+                    return this._replaceImagesWithAltAttributes();
                 case "viewImageInformation":
-                    document.getElementById("__wd_image_info_modal")?.remove();
-                    return res(true, "Image info closed", 1);
+                    // One-shot function
+                    this._viewImageInformation();
+                    return res(true, "Image info opened");
                 default:
-                    return res(false, `Unknown image function to revert: ${functionName}`, 0);
+                    return res(false, `Unknown function: ${functionName}`);
             }
         }
 
-        // ---------- revert helpers ----------
-        restoreImgStyles() {
-            let count = 0;
-            document.querySelectorAll("img").forEach((img) => {
-                const st = this.imgStates.get(img);
-                if (!st) return;
-                img.setAttribute("style", st.styleAttr);
-                count++;
-            });
-            return count ? res(true, `Restored image styles (${count})`, count) : res(false, "No images to restore", 0);
-        }
+        // ==================== ACTUAL FUNCTION IMPLEMENTATIONS ====================
 
-        restoreElementStyles() {
-            let count = 0;
-            this.elStates.forEach((st, el) => {
-                if (!el?.isConnected) return;
-                el.setAttribute("style", st.styleAttr);
-                count++;
-            });
-            return count ? res(true, `Restored element styles (${count})`, count) : res(false, "No elements to restore", 0);
-        }
-
-        removeOverlay(kind) {
-            let removed = 0;
-            document.querySelectorAll("img").forEach((img) => {
-                const st = this.imgStates.get(img);
-                if (!st) return;
-                const node = st.overlays[kind];
-                if (node && node.isConnected) {
-                    node.remove();
-                    st.overlays[kind] = null;
-                    removed++;
-                }
-                this.removeWrapIfEmpty(img);
-            });
-            return removed ? res(true, `Overlay "${kind}" removed (${removed})`, removed) : res(false, `Overlay "${kind}" not found`, 0);
-        }
-
-        // ---------- functions ----------
-        disableImages() {
+        _disableImages() {
             const imgs = [...document.querySelectorAll("img")];
             if (!imgs.length) return res(false, "No images found", 0);
 
-            // global style (only once)
             const styleId = "__wd_disable_images_style";
             if (!document.getElementById(styleId)) {
                 const style = document.createElement("style");
                 style.id = styleId;
                 style.textContent = `
-          .__wd_disable_wrap { position:relative; display:inline-block; line-height:0; }
-          .__wd_disable_wrap img { pointer-events:none !important; opacity:.7 !important; cursor:not-allowed !important; user-select:none !important; }
-          .__wd_disable_overlay {
-            position:absolute; inset:0; background:rgba(255,0,0,.12);
-            pointer-events:none; z-index:999999;
-          }
-        `;
+.__wd_disable_wrap { position:relative; display:inline-block; line-height:0; }
+.__wd_disable_wrap img { pointer-events:none !important; opacity:.7 !important; cursor:not-allowed !important; user-select:none !important; }
+.__wd_disable_overlay {
+  position:absolute; inset:0; background:rgba(255,0,0,.12);
+  pointer-events:none; z-index:999999;
+}
+`;
                 document.head.appendChild(style);
             }
 
             let wrapped = 0;
-
             imgs.forEach((img) => {
-                // if already wrapped
                 if (img.closest("span.__wd_disable_wrap")) return;
 
                 const st = this.trackImg(img);
-
-                // create wrapper
                 const wrap = document.createElement("span");
                 wrap.className = "__wd_disable_wrap";
 
@@ -244,12 +313,12 @@
                 overlay.className = "__wd_disable_overlay";
                 wrap.appendChild(overlay);
 
-                // prevent interactions (capture)
                 const prevent = (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     e.stopImmediatePropagation();
                 };
+
                 const events = ["click", "contextmenu", "dragstart", "mousedown", "mouseup"];
                 const listeners = events.map((t) => {
                     const h = (e) => prevent(e);
@@ -260,60 +329,27 @@
                 st.disableWrap = wrap;
                 st.disableOverlay = overlay;
                 st.disableListeners = listeners;
-
                 wrapped++;
             });
 
-            return wrapped
-                ? res(true, `Images disabled (${wrapped})`, wrapped)
-                : res(false, "Images already disabled", 0);
+            return res(true, `Images disabled (${wrapped})`, wrapped);
         }
 
-        revertDisableImages() {
-            // remove global style
-            document.getElementById("__wd_disable_images_style")?.remove();
-
-            let unwrapped = 0;
-            document.querySelectorAll("img").forEach((img) => {
-                const st = this.imgStates.get(img);
-                if (!st) return;
-
-                // remove listeners
-                if (st.disableListeners) {
-                    st.disableListeners.forEach(({ t, h }) => img.removeEventListener(t, h, true));
-                    st.disableListeners = null;
-                }
-
-                // unwrap
-                if (st.disableWrap && st.disableWrap.isConnected) {
-                    const wrap = st.disableWrap;
-                    wrap.replaceWith(img); // safely put img back
-                    unwrapped++;
-                }
-
-                st.disableWrap = null;
-                st.disableOverlay = null;
-            });
-
-            return unwrapped ? res(true, `Images enabled (${unwrapped})`, unwrapped) : res(false, "No disabled images found", 0);
-        }
-
-        hideImages() {
+        _hideImages() {
             const imgs = [...document.querySelectorAll("img")];
             if (!imgs.length) return res(false, "No images found", 0);
 
             let changed = 0;
             imgs.forEach((img) => {
-                const st = this.trackImg(img);
-                // store original only once (already in styleAttr)
+                this.trackImg(img);
                 if (getComputedStyle(img).display !== "none") changed++;
                 img.style.display = "none";
             });
 
-            return changed ? res(true, `Images hidden (${changed})`, changed) : res(false, "Images already hidden", 0);
+            return res(true, `Images hidden (${changed})`, changed);
         }
 
-        hideBackgroundImages() {
+        _hideBackgroundImages() {
             const els = [...document.querySelectorAll("*")];
             if (!els.length) return res(false, "No elements found", 0);
 
@@ -327,27 +363,25 @@
                 }
             });
 
-            return changed ? res(true, `Background images hidden (${changed})`, changed) : res(false, "No background images found", 0);
+            return res(true, `Background images hidden (${changed})`, changed);
         }
 
-        makeImagesFullSize() {
+        _makeImagesFullSize() {
             const imgs = [...document.querySelectorAll("img")];
             if (!imgs.length) return res(false, "No images found", 0);
 
-            let changed = 0;
             imgs.forEach((img) => {
                 this.trackImg(img);
                 img.style.maxWidth = "none";
                 img.style.maxHeight = "none";
                 img.style.width = "auto";
                 img.style.height = "auto";
-                changed++;
             });
 
-            return res(true, `Images set to full size (${changed})`, changed);
+            return res(true, `Images set to full size (${imgs.length})`, imgs.length);
         }
 
-        makeImagesInvisible() {
+        _makeImagesInvisible() {
             const imgs = [...document.querySelectorAll("img")];
             if (!imgs.length) return res(false, "No images found", 0);
 
@@ -358,10 +392,10 @@
                 img.style.opacity = "0";
             });
 
-            return changed ? res(true, `Images made invisible (${changed})`, changed) : res(false, "Images already invisible", 0);
+            return res(true, `Images made invisible (${changed})`, changed);
         }
 
-        outlineAllImages() {
+        _outlineAllImages() {
             const imgs = [...document.querySelectorAll("img")];
             if (!imgs.length) return res(false, "No images found", 0);
 
@@ -373,7 +407,7 @@
             return res(true, `Outlined images (${imgs.length})`, imgs.length);
         }
 
-        outlineBackgroundImages() {
+        _outlineBackgroundImages() {
             const els = [...document.querySelectorAll("*")];
             let changed = 0;
 
@@ -386,30 +420,27 @@
                 }
             });
 
-            return changed ? res(true, `Outlined background images (${changed})`, changed) : res(false, "No background images found", 0);
+            return res(true, `Outlined background images (${changed})`, changed);
         }
 
-        outlineImagesWithAdjustedDimensions() {
+        _outlineImagesWithAdjustedDimensions() {
             const imgs = [...document.querySelectorAll("img")];
             let changed = 0;
 
             imgs.forEach((img) => {
-                if (
-                    img.naturalWidth &&
-                    img.naturalHeight &&
+                if (img.naturalWidth && img.naturalHeight &&
                     (Math.abs(img.width - img.naturalWidth) > 1 ||
-                        Math.abs(img.height - img.naturalHeight) > 1)
-                ) {
+                        Math.abs(img.height - img.naturalHeight) > 1)) {
                     this.trackImg(img);
                     img.style.outline = "2px dashed orange";
                     changed++;
                 }
             });
 
-            return changed ? res(true, `Outlined adjusted images (${changed})`, changed) : res(false, "No adjusted images found", 0);
+            return res(true, `Outlined adjusted images (${changed})`, changed);
         }
 
-        outlineImagesWithEmptyAltAttributes() {
+        _outlineImagesWithEmptyAltAttributes() {
             const imgs = [...document.querySelectorAll('img[alt=""]')];
             if (!imgs.length) return res(false, 'No images with alt="" found', 0);
 
@@ -421,22 +452,22 @@
             return res(true, `Outlined empty-alt images (${imgs.length})`, imgs.length);
         }
 
-        outlineImagesWithOversizedDimensions() {
+        _outlineImagesWithOversizedDimensions() {
             const imgs = [...document.querySelectorAll("img")];
             let changed = 0;
 
             imgs.forEach((img) => {
-                if (img.naturalWidth > 2000 || img.naturalHeight > 2000) {
+                if ((img.naturalWidth || 0) > 2000 || (img.naturalHeight || 0) > 2000) {
                     this.trackImg(img);
                     img.style.outline = "3px solid black";
                     changed++;
                 }
             });
 
-            return changed ? res(true, `Outlined oversized images (${changed})`, changed) : res(false, "No oversized images found", 0);
+            return res(true, `Outlined oversized images (${changed})`, changed);
         }
 
-        outlineImagesWithoutAltAttributes() {
+        _outlineImagesWithoutAltAttributes() {
             const imgs = [...document.querySelectorAll("img")].filter((img) => !img.hasAttribute("alt"));
             if (!imgs.length) return res(false, "No images without alt found", 0);
 
@@ -448,7 +479,7 @@
             return res(true, `Outlined images without alt (${imgs.length})`, imgs.length);
         }
 
-        outlineImagesWithoutDimensions() {
+        _outlineImagesWithoutDimensions() {
             const imgs = [...document.querySelectorAll("img")].filter(
                 (img) => !img.hasAttribute("width") && !img.hasAttribute("height")
             );
@@ -462,15 +493,13 @@
             return res(true, `Outlined images without dimensions (${imgs.length})`, imgs.length);
         }
 
-        displayAltAttributes() {
+        _displayAltAttributes() {
             const imgs = [...document.querySelectorAll("img")];
             if (!imgs.length) return res(false, "No images found", 0);
 
             let shown = 0;
             imgs.forEach((img) => {
                 const st = this.trackImg(img);
-
-                // remove old
                 if (st.overlays.alt?.isConnected) st.overlays.alt.remove();
 
                 const wrap = this.ensureWrap(img);
@@ -479,11 +508,11 @@
                 const box = document.createElement("span");
                 box.className = "__wd_alt_overlay";
                 box.style.cssText = `
-          position:absolute; left:0; right:0; bottom:0;
-          background:rgba(0,0,0,.72); color:#fff;
-          padding:3px 6px; font-size:12px; z-index:999999;
-          pointer-events:none; line-height:1.2;
-        `;
+position:absolute; left:0; right:0; bottom:0;
+background:rgba(0,0,0,.72); color:#fff;
+padding:6px 6px; font-size:12px; z-index:999999;
+pointer-events:none; line-height:1.2;
+`;
                 box.textContent = `Alt: ${img.alt || "(no alt)"}`;
 
                 wrap.appendChild(box);
@@ -491,10 +520,10 @@
                 shown++;
             });
 
-            return shown ? res(true, `Alt labels shown (${shown})`, shown) : res(false, "No alt labels shown", 0);
+            return res(true, `Alt labels shown (${shown})`, shown);
         }
 
-        displayImageDimensions() {
+        _displayImageDimensions() {
             const imgs = [...document.querySelectorAll("img")];
             if (!imgs.length) return res(false, "No images found", 0);
 
@@ -511,11 +540,11 @@
 
                 const box = document.createElement("span");
                 box.style.cssText = `
-          position:absolute; top:0; right:0;
-          background:rgba(0,100,0,.72); color:#fff;
-          padding:3px 6px; font-size:12px; z-index:999999;
-          pointer-events:none; border-radius:0 0 0 4px;
-        `;
+position:absolute; top:0; right:0;
+background:rgba(0,100,0,.72); color:#fff;
+padding:6px 6px; font-size:12px; z-index:999999;
+pointer-events:none; border-radius:0 0 0 4px;
+`;
                 box.textContent = `${w}×${h}`;
 
                 wrap.appendChild(box);
@@ -523,10 +552,10 @@
                 shown++;
             });
 
-            return shown ? res(true, `Dimensions shown (${shown})`, shown) : res(false, "No dimensions shown", 0);
+            return res(true, `Dimensions shown (${shown})`, shown);
         }
 
-        displayImagePaths() {
+        _displayImagePaths() {
             const imgs = [...document.querySelectorAll("img")];
             if (!imgs.length) return res(false, "No images found", 0);
 
@@ -543,12 +572,12 @@
 
                 const box = document.createElement("span");
                 box.style.cssText = `
-          position:absolute; top:0; left:0;
-          background:rgba(0,0,100,.72); color:#fff;
-          padding:3px 6px; font-size:11px; z-index:999999;
-          pointer-events:none; max-width:220px; overflow:hidden;
-          text-overflow:ellipsis; white-space:nowrap; border-radius:0 0 4px 0;
-        `;
+position:absolute; top:0; left:0;
+background:rgba(0,0,100,.72); color:#fff;
+padding:6px 6px; font-size:11px; z-index:999999;
+pointer-events:none; max-width:220px; overflow:hidden;
+text-overflow:ellipsis; white-space:nowrap; border-radius:0 0 4px 0;
+`;
                 box.textContent = short;
                 box.title = full;
 
@@ -557,10 +586,10 @@
                 shown++;
             });
 
-            return shown ? res(true, `Paths shown (${shown})`, shown) : res(false, "No paths shown", 0);
+            return res(true, `Paths shown (${shown})`, shown);
         }
 
-        replaceImagesWithAltAttributes() {
+        _replaceImagesWithAltAttributes() {
             const imgs = [...document.querySelectorAll("img")];
             if (!imgs.length) return res(false, "No images found", 0);
 
@@ -569,14 +598,17 @@
                 const alt = (img.getAttribute("alt") || "").trim();
                 if (!alt) return;
 
-                const st = this.trackImg(img);
-                // store original src once
-                if (!st.originalSrc) st.originalSrc = img.currentSrc || img.src;
+                this.trackImg(img);
+
+                const cw = Math.max(80, img.width || img.clientWidth || img.naturalWidth || 150);
+                const ch = Math.max(60, img.height || img.clientHeight || img.naturalHeight || 150);
 
                 const canvas = document.createElement("canvas");
-                canvas.width = img.width || 150;
-                canvas.height = img.height || 150;
+                canvas.width = cw;
+                canvas.height = ch;
+
                 const ctx = canvas.getContext("2d");
+                if (!ctx) return;
 
                 ctx.fillStyle = "#f0f0f0";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -588,6 +620,7 @@
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
 
+                // Word wrap logic
                 const words = alt.split(/\s+/);
                 let line = "";
                 const lines = [];
@@ -608,27 +641,18 @@
                 const startY = (canvas.height - lines.length * lh) / 2 + lh / 2;
                 lines.forEach((t, i) => ctx.fillText(t, canvas.width / 2, startY + i * lh));
 
+                img.removeAttribute("srcset");
+                img.removeAttribute("sizes");
                 img.src = canvas.toDataURL();
                 replaced++;
             });
 
-            return replaced ? res(true, `Images replaced with alt placeholders (${replaced})`, replaced) : res(false, "No images with non-empty alt found", 0);
+            return replaced
+                ? res(true, `Images replaced with alt placeholders (${replaced})`, replaced)
+                : res(false, "No images with non-empty alt found", 0);
         }
 
-        restoreOriginalImages() {
-            let restored = 0;
-            document.querySelectorAll("img").forEach((img) => {
-                const st = this.imgStates.get(img);
-                if (!st?.originalSrc) return;
-                if (img.src !== st.originalSrc) {
-                    img.src = st.originalSrc;
-                    restored++;
-                }
-            });
-            return restored ? res(true, `Original images restored (${restored})`, restored) : res(false, "No images to restore", 0);
-        }
-
-        viewImageInformation() {
+        _viewImageInformation() {
             const imgs = [...document.querySelectorAll("img")];
             const total = imgs.length;
 
@@ -640,10 +664,10 @@
                 const w = img.naturalWidth || img.width || "unknown";
                 const h = img.naturalHeight || img.height || "unknown";
                 const alt = img.alt || "(no alt)";
-                const src = (img.currentSrc || img.src || "");
+                const src = img.currentSrc || img.src || "";
                 const short = src.length > 90 ? src.slice(0, 87) + "..." : src;
                 const hasDim = img.hasAttribute("width") || img.hasAttribute("height");
-                const oversized = (img.naturalWidth > 2000 || img.naturalHeight > 2000) ? "YES" : "no";
+                const oversized = (img.naturalWidth || 0) > 2000 || (img.naturalHeight || 0) > 2000 ? "YES" : "no";
 
                 lines.push(`${i + 1}. ${short}`);
                 lines.push(`   Alt: ${alt}`);
@@ -654,24 +678,23 @@
                 lines.push("");
             });
 
-            this.showInfoModal(lines.join("\n"));
-            return res(true, `Image info opened (total ${total})`, total);
+            this._showInfoModal(lines.join("\n"));
         }
 
-        showInfoModal(content) {
+        _showInfoModal(content) {
             const existing = document.getElementById("__wd_image_info_modal");
             if (existing) existing.remove();
 
             const modal = document.createElement("div");
             modal.id = "__wd_image_info_modal";
             modal.style.cssText = `
-        position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-        background:#fff; padding:16px; border-radius:10px;
-        box-shadow:0 10px 40px rgba(0,0,0,.35);
-        z-index:2147483647; max-width:80%; max-height:80%;
-        overflow:auto; font-family:monospace; font-size:12px; white-space:pre;
-        border:2px solid #333;
-      `;
+position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+background:#fff; padding:16px; border-radius:10px;
+box-shadow:0 10px 40px rgba(0,0,0,.35);
+z-index:2147483647; max-width:80%; max-height:80%;
+overflow:auto; font-family:monospace; font-size:12px; white-space:pre;
+border:2px solid #333;
+`;
 
             const close = () => {
                 document.removeEventListener("keydown", onKeyDown);
@@ -681,11 +704,11 @@
             const btn = document.createElement("button");
             btn.textContent = "Close";
             btn.style.cssText = `
-        position:sticky; top:0; float:right;
-        background:#ff4444; color:#fff; border:none;
-        padding:6px 10px; border-radius:6px; cursor:pointer;
-        font-family:system-ui;
-      `;
+position:sticky; top:0; float:right;
+background:#ff4444; color:#fff; border:none;
+padding:6px 10px; border-radius:6px; cursor:pointer;
+font-family:system-ui;
+`;
             btn.onclick = close;
 
             const pre = document.createElement("pre");
@@ -704,6 +727,6 @@
         }
     }
 
-    // Export instance
+    // Create and expose the singleton
     window.imageFunctions = new ImageFunctions();
 })();

@@ -6,95 +6,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Web Developer</title>
   <link rel="stylesheet" href="popup.css" />
-  <style>
-    /* Make list items clickable */
-    .list-group-item.text-link {
-      cursor: pointer;
-    }
-
-    .list-group-item.text-link.active {
-      background-color: #0d6efd;
-      color: white;
-    }
-  </style>
 </head>
 
 <body class="bg-light p-2">
-  <!-- Category Tabs -->
   <ul class="nav nav-tabs nav-fill mb-2" id="categoryTabs" role="tablist">
     <li class="nav-item">
       <button class="nav-link active" data-category="disable" type="button">
-        <img src="icons/disable.svg" alt="Disable" class="tab-icon" /> Disable
+        <img src="icons/disable.svg" alt="Disable" class="tab-icon" /> disable
       </button>
     </li>
+
     <li class="nav-item">
       <button class="nav-link" data-category="css" type="button">
-        <img src="icons/css.svg" alt="CSS" class="tab-icon" /> CSS
+        <img src="icons/css.svg" alt="CSS" class="tab-icon" /> css
       </button>
     </li>
+
     <li class="nav-item">
       <button class="nav-link" data-category="cookies" type="button">
-        <img src="icons/cookies.svg" alt="Cookies" class="tab-icon" /> Cookies
+        <img src="icons/cookies.svg" alt="Cookies" class="tab-icon" /> cookies
       </button>
     </li>
+
     <li class="nav-item">
       <button class="nav-link" data-category="forms" type="button">
-        <img src="icons/forms.svg" alt="Forms" class="tab-icon" /> Forms
+        <img src="icons/forms.svg" alt="Forms" class="tab-icon" /> forms
       </button>
     </li>
+
     <li class="nav-item">
-      <button class="nav-link" data-category="images" type="button">
-        <img src="icons/images.svg" alt="Images" class="tab-icon" /> Images
+      <button class="nav-link" data-category="image" type="button">
+        <img src="icons/images.svg" alt="Images" class="tab-icon" /> images
       </button>
     </li>
+
     <li class="nav-item">
-      <button class="nav-link" data-category="info" type="button">
-        <img src="icons/information.svg" alt="Info" class="tab-icon" />
-        Information
+      <button class="nav-link" data-category="pageSize" type="button">
+        <img src="icons/size.svg" alt="Page size" class="tab-icon" />
+        page size
       </button>
     </li>
+
     <li class="nav-item">
       <button class="nav-link" data-category="outline" type="button">
         <img src="icons/outline.svg" alt="outline" class="tab-icon" />
-        Outline
+        outline
       </button>
     </li>
+
     <li class="nav-item">
       <button class="nav-link" data-category="resize" type="button">
         <img src="icons/resize.svg" alt="resize" class="tab-icon" />
-        Resize
+        resize
       </button>
     </li>
+
     <li class="nav-item">
       <button class="nav-link" data-category="miscellaneous" type="button">
         <img src="icons/miscellaneous.svg" alt="miscellaneous" class="tab-icon" />
-        Miscellaneous
+        miscellaneous
       </button>
     </li>
+
+    <li class="nav-item">
+      <button class="nav-link" data-category="seo" type="button">
+        <img src="icons/seo.svg" alt="seo" class="tab-icon" />
+        seo
+      </button>
+    </li>
+
     <li class="nav-item">
       <button class="nav-link" data-category="tools" type="button">
         <img src="icons/tools.svg" alt="tools" class="tab-icon" />
-        Tools
+        tools
+      </button>
+    </li>
+
+    <li class="nav-item">
+      <button class="nav-link" data-category="info" type="button">
+        <img src="icons/information.svg" alt="Info" class="tab-icon" />
+        information
       </button>
     </li>
   </ul>
 
-  <!-- Function panels -->
+
   <div id="tabContent">
-    <!-- Disable Features -->
+    <!-- Disable -->
     <div class="tab-panel" data-category="disable">
       <ul class="list-group list-group-flush">
         <li class="list-group-item text-link" data-disable="disableJavaScript">
-          Disable JavaScript
+          disable JavaScript
         </li>
         <li class="list-group-item text-link" data-disable="disableNotifications">
-          Disable Notifications
+          disable notifications
         </li>
         <li class="list-group-item text-link" data-disable="disablePopups">
-          Disable Popups
-        </li>
-        <li class="list-group-item text-link" data-disable="resetAll">
-          Reset Disabled Features
+          disable popups
         </li>
       </ul>
     </div>
@@ -103,39 +111,36 @@
     <div class="tab-panel d-none" data-category="cookies">
       <ul class="list-group list-group-flush" id="cookiesActions">
         <li class="list-group-item text-link" data-cookies="disableCookies">
-          Disable Cookies
+          disable cookies
         </li>
         <li class="list-group-item text-link" data-cookies="addCookie">
-          Add Cookie...
+          add cookie...
         </li>
         <li class="list-group-item text-link" data-cookies="deleteDomainCookies">
-          Delete Domain Cookies
+          delete domain cookies
         </li>
         <li class="list-group-item text-link" data-cookies="deletePathCookies">
-          Delete Path Cookies
+          delete path cookies
         </li>
         <li class="list-group-item text-link" data-cookies="deleteSessionCookies">
-          Delete Session Cookies
+          delete session cookies
         </li>
         <li class="list-group-item text-link" data-cookies="viewCookieInfo">
-          View Cookie Information
+          view cookie information
         </li>
       </ul>
 
-      <!-- Message area -->
-      <div id="cookiesMessage" class="mt-2 p-2 rounded"></div>
 
-      <!-- Add Cookie form (hidden by default) -->
       <div id="addCookieForm" class="d-none border p-2 rounded mt-2">
-        <h6>Add New Cookie</h6>
+        <h6>add new cookie</h6>
         <input id="cookieName" class="form-control mb-1" placeholder="Name" />
         <input id="cookieValue" class="form-control mb-1" placeholder="Value" />
         <input id="cookieDomain" class="form-control mb-1" placeholder="Domain (example.com)" />
         <input id="cookiePath" class="form-control mb-1" placeholder="Path (default /)" />
         <div class="d-flex gap-2">
-          <button id="cookieSave" class="btn btn-sm btn-success">Save</button>
+          <button id="cookieSave" class="btn btn-sm btn-success">save</button>
           <button id="cookieCancel" class="btn btn-sm btn-secondary">
-            Cancel
+            cancel
           </button>
         </div>
       </div>
@@ -145,94 +150,95 @@
     <div class="tab-panel d-none" data-category="css">
       <ul class="list-group list-group-flush">
         <li class="list-group-item text-link" data-func="disableAllStyles">
-          Disable All Styles
+          disable all styles
         </li>
         <li class="list-group-item text-link" data-func="disableBrowserDefault">
-          Browser Default
+          browser default
         </li>
         <li class="list-group-item text-link" data-func="disableEmbedded">
-          Embedded Styles
+          embedded styles
         </li>
         <li class="list-group-item text-link" data-func="disableInline">
-          Inline Styles
+          inline styles
         </li>
         <li class="list-group-item text-link" data-func="disableLinked">
-          Linked Sheets
+          linked sheets
         </li>
         <li class="list-group-item text-link" data-func="disablePrint">
-          Print Styles
+          print styles
         </li>
         <li class="list-group-item text-link" data-func="displayHandheld">
-          Handheld Styles
+          handheld styles
         </li>
         <li class="list-group-item text-link" data-func="displayPrint">
-          Print Media
+          print media
         </li>
         <li class="list-group-item text-link" data-func="reloadLinked">
-          Reload Sheets
+          reload sheets
         </li>
         <li class="list-group-item text-link" data-func="borderBox">
-          Border Box
+          border box
         </li>
+        <li class="list-group-item text-link" data-func="viewFonts">view fonts</li>
         <li class="list-group-item text-link" data-func="viewCSS">
-          View CSS
+          view CSS
         </li>
       </ul>
     </div>
 
     <!-- Images -->
-    <div class="tab-panel d-none" data-category="images">
+    <div class="tab-panel d-none" data-category="image">
       <ul class="list-group list-group-flush" id="imagesActions">
         <li class="list-group-item text-link" data-image="disableImages">
-          Disable Images
+          disable images
         </li>
         <li class="list-group-item text-link" data-image="hideImages">
-          Hide Images
+          hide images
         </li>
         <li class="list-group-item text-link" data-image="hideBackgroundImages">
-          Hide Background Images
+          hide background images
         </li>
         <li class="list-group-item text-link" data-image="makeImagesFullSize">
-          Make Images Full Size
+          make images full size
         </li>
         <li class="list-group-item text-link" data-image="makeImagesInvisible">
-          Make Images Invisible
+          make images invisible
         </li>
         <li class="list-group-item text-link" data-image="outlineAllImages">
-          Outline All Images
+          outline all images
         </li>
         <li class="list-group-item text-link" data-image="outlineBackgroundImages">
-          Outline Background Images
+          outline background images
         </li>
         <li class="list-group-item text-link" data-image="outlineImagesWithAdjustedDimensions">
-          Outline Images With Adjusted Dimensions
+          outline images with adjusted dimensions
         </li>
         <li class="list-group-item text-link" data-image="outlineImagesWithEmptyAltAttributes">
-          Outline Images With Empty Alt Attributes
+          outline images with empty alt attributes
         </li>
         <li class="list-group-item text-link" data-image="outlineImagesWithOversizedDimensions">
-          Outline Images With Oversized Dimensions
+          outline images with oversized dimensions
         </li>
         <li class="list-group-item text-link" data-image="outlineImagesWithoutAltAttributes">
-          Outline Images Without Alt Attributes
+          outline images without alt attributes
         </li>
         <li class="list-group-item text-link" data-image="outlineImagesWithoutDimensions">
-          Outline Images Without Dimensions
+          outline images without dimensions
         </li>
         <li class="list-group-item text-link" data-image="displayAltAttributes">
-          Display Alt Attributes
+          display alt attributes
         </li>
         <li class="list-group-item text-link" data-image="displayImageDimensions">
-          Display Image Dimensions
+          display image dimensions
         </li>
         <li class="list-group-item text-link" data-image="displayImagePaths">
-          Display Image Paths
+          display image paths
         </li>
         <li class="list-group-item text-link" data-image="replaceImagesWithAltAttributes">
-          Replace Images With Alt Attributes
+          replace images with alt attributes
         </li>
         <li class="list-group-item text-link" data-image="viewImageInformation">
-          View Image Information
+          view image information
         </li>
       </ul>
     </div>
@@ -240,197 +246,98 @@
     <!-- Info -->
     <div class="tab-panel d-none" data-category="info">
       <ul class="list-group list-group-flush">
-        <li class="list-group-item text-link" data-info="pageInfo">
-          Page Info
-        </li>
-
-        <li class="list-group-item text-link" data-info="displayAbbreviations">
-          Display Abbreviations
-        </li>
-        <li class="list-group-item text-link" data-info="displayAccessKeys">
-          Display Access Keys
-        </li>
-        <li class="list-group-item text-link" data-info="displayAnchors">
-          Display Anchors
-        </li>
-        <li class="list-group-item text-link" data-info="displayAriaRoles">
-          Display ARIA Roles
-        </li>
-        <li class="list-group-item text-link" data-info="displayDivDimensions">
-          Display Div Dimensions
-        </li>
-        <li class="list-group-item text-link" data-info="displayDivOrder">
-          Display Div Order
-        </li>
-        <li class="list-group-item text-link" data-info="displayElementInformation">
-          Display Element Information
-        </li>
-        <li class="list-group-item text-link" data-info="displayIdClassDetails">
-          Display Id &amp; Class Details
-        </li>
-
-        <li class="list-group-item text-link" data-info="displayLinkDetails">
-          Display Link Details
-        </li>
-        <li class="list-group-item text-link" data-info="displayObjectInformation">
-          Display Object Information
-        </li>
-        <li class="list-group-item text-link" data-info="displayStackLevels">
-          Display Stack Levels
-        </li>
-        <li class="list-group-item text-link" data-info="displayTabIndex">
-          Display Tab Index
-        </li>
-        <li class="list-group-item text-link" data-info="displayTableDepth">
-          Display Table Depth
-        </li>
-        <li class="list-group-item text-link" data-info="displayTableInformation">
-          Display Table Information
-        </li>
-        <li class="list-group-item text-link" data-info="displayTitleAttributes">
-          Display Title Attributes
-        </li>
+        <li class="list-group-item text-link" data-info="pageInfo">page info</li>
+        <li class="list-group-item text-link" data-info="displayAbbreviations">display abbreviations</li>
+        <li class="list-group-item text-link" data-info="displayAccessKeys">display access keys</li>
+        <li class="list-group-item text-link" data-info="displayAnchors">display anchors</li>
+        <li class="list-group-item text-link" data-info="displayAriaRoles">display aria roles</li>
+        <li class="list-group-item text-link" data-info="displayDivDimensions">display div dimensions</li>
+        <li class="list-group-item text-link" data-info="displayDivOrder">display div order</li>
+        <li class="list-group-item text-link" data-info="displayElementInformation">display element information</li>
+        <li class="list-group-item text-link" data-info="displayIdClassDetails">display id &amp; class details</li>
+        <li class="list-group-item text-link" data-info="displayLinkDetails">display link details</li>
+        <li class="list-group-item text-link" data-info="displayObjectInformation">display object information</li>
+        <li class="list-group-item text-link" data-info="displayStackLevels">display stack levels</li>
+        <li class="list-group-item text-link" data-info="displayTabIndex">display tab index</li>
+        <li class="list-group-item text-link" data-info="displayTableDepth">display table depth</li>
+        <li class="list-group-item text-link" data-info="displayTableInformation">display table information</li>
+        <li class="list-group-item text-link" data-info="displayTitleAttributes">display title attributes</li>
         <li class="list-group-item text-link" data-info="displayTopographicInformation">
-          Display Topographic Information
+          display topographic information
         </li>
+        <li class="list-group-item text-link" data-info="findDuplicateIds">find duplicate ids</li>
+        <li class="list-group-item text-link" data-info="viewAnchorInformation">view anchor information</li>
+        <li class="list-group-item text-link" data-info="viewColorInformation">view color information</li>
+        <li class="list-group-item text-link" data-info="viewDocumentOutline">view document outline</li>
+        <li class="list-group-item text-link" data-info="viewJavaScript">view javascript</li>
+        <li class="list-group-item text-link" data-info="viewLinkInformation">view link information</li>
+        <li class="list-group-item text-link" data-info="viewMetaTagInformation">view meta tag information</li>
+        <li class="list-group-item text-link" data-info="viewResponseHeaders">view response headers</li>
+      </ul>
+    </div>
 
-        <li class="list-group-item text-link" data-info="findDuplicateIds">
-          Find Duplicate Ids
-        </li>
-        <li class="list-group-item text-link" data-info="viewAnchorInformation">
-          View Anchor Information
-        </li>
-        <li class="list-group-item text-link" data-info="viewColorInformation">
-          View Color Information
-        </li>
-        <li class="list-group-item text-link" data-info="viewDocumentOutline">
-          View Document Outline
-        </li>
-        <li class="list-group-item text-link" data-info="viewJavaScript">
-          View JavaScript
-        </li>
-        <li class="list-group-item text-link" data-info="viewLinkInformation">
-          View Link Information
-        </li>
-        <li class="list-group-item text-link" data-info="viewMetaTagInformation">
-          View Meta Tag Information
-        </li>
-        <li class="list-group-item text-link" data-info="viewResponseHeaders">
-          View Response Headers
-        </li>
+    <!-- Page Size -->
+    <div class="tab-panel d-none" data-category="pageSize">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item text-link" data-pageSize="htmlDocumentSize">html document size (KB)</li>
+        <li class="list-group-item text-link" data-pageSize="totalImagesSize">total images size (KB / MB)</li>
+        <li class="list-group-item text-link" data-pageSize="totalCssSize">total css size</li>
+        <li class="list-group-item text-link" data-pageSize="totalJsSize">total js size</li>
+        <li class="list-group-item text-link" data-pageSize="fontsSize">fonts size</li>
+        <li class="list-group-item text-link" data-pageSize="otherAssetsSize">other assets size</li>
+        <li class="list-group-item text-link" data-pageSize="totalPageWeight">total page weight</li>
+        <li class="list-group-item text-link" data-pageSize="numberOfRequests">number of requests</li>
       </ul>
     </div>
 
     <!-- Outline -->
     <div class="tab-panel d-none" data-category="outline">
       <ul class="list-group list-group-flush">
-        <li class="list-group-item text-link" data-outline="outlineAbsolutePositionedElements">
-          Outline Absolute Positioned Elements
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineBlockLevelElements">
-          Outline Block Level Elements
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineDeprecatedElements">
-          Outline Deprecated Elements
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineExternalLinks">
-          Outline External Links
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineFixedPositionedElements">
-          Outline Fixed Positioned Elements
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineFloatedElements">
-          Outline Floated Elements
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineFrames">
-          Outline Frames
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineHeadings">
-          Outline Headings
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineNonSecureElements">
-          Outline Non-Secure Elements
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineRelativePositionedElements">
-          Outline Relative Positioned Elements
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineTableCaptions">
-          Outline Table Captions
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineTableCells">
-          Outline Table Cells
-        </li>
-        <li class="list-group-item text-link" data-outline="outlineTables">
-          Outline Tables
-        </li>
-        <li class="list-group-item text-link" data-outline="showElementTagNames">
-          Show Element Tag Names
-        </li>
+        <li class="list-group-item text-link" data-outline="outlineAbsolutePositionedElements">outline absolute
+          positioned elements</li>
+        <li class="list-group-item text-link" data-outline="outlineBlockLevelElements">outline block level elements</li>
+        <li class="list-group-item text-link" data-outline="outlineDeprecatedElements">outline deprecated elements</li>
+        <li class="list-group-item text-link" data-outline="outlineExternalLinks">outline external links</li>
+        <li class="list-group-item text-link" data-outline="outlineFixedPositionedElements">outline fixed positioned
+          elements</li>
+        <li class="list-group-item text-link" data-outline="outlineFloatedElements">outline floated elements</li>
+        <li class="list-group-item text-link" data-outline="outlineFrames">outline frames</li>
+        <li class="list-group-item text-link" data-outline="outlineHeadings">outline headings</li>
+        <li class="list-group-item text-link" data-outline="outlineNonSecureElements">outline non-secure elements</li>
+        <li class="list-group-item text-link" data-outline="outlineRelativePositionedElements">outline relative
+          positioned elements</li>
+        <li class="list-group-item text-link" data-outline="outlineTableCaptions">outline table captions</li>
+        <li class="list-group-item text-link" data-outline="outlineTableCells">outline table cells</li>
+        <li class="list-group-item text-link" data-outline="outlineTables">outline tables</li>
+        <li class="list-group-item text-link" data-outline="showElementTagNames">show element tag names</li>
       </ul>
     </div>
 
     <!-- Forms -->
     <div class="tab-panel d-none" data-category="forms">
       <ul class="list-group list-group-flush">
-        <li class="list-group-item text-link" data-form="checkAllCheckboxes">
-          Check All Checkboxes
+        <li class="list-group-item text-link" data-form="checkAllCheckboxes">check all checkboxes</li>
+        <li class="list-group-item text-link" data-form="uncheckAllCheckboxes">uncheck all checkboxes</li>
+        <li class="list-group-item text-link" data-form="clearFormFields">clear form fields</li>
+        <li class="list-group-item text-link" data-form="clearRadioButtons">clear radio buttons</li>
+        <li class="list-group-item text-link" data-form="convertFormGetsToPosts">convert form gets to posts</li>
+        <li class="list-group-item text-link" data-form="convertFormPostsToGets">convert form posts to gets</li>
+        <li class="list-group-item text-link" data-form="convertSelectElementsToTextInputs">convert select elements to
+          text inputs</li>
+        <li class="list-group-item text-link" data-form="convertTextInputsToTextareas">convert text inputs to textareas
         </li>
-        <li class="list-group-item text-link" data-form="uncheckAllCheckboxes">
-          Uncheck All Checkboxes
-        </li>
-        <li class="list-group-item text-link" data-form="clearFormFields">
-          Clear Form Fields
-        </li>
-        <li class="list-group-item text-link" data-form="clearRadioButtons">
-          Clear Radio Buttons
-        </li>
-        <li class="list-group-item text-link" data-form="convertFormGetsToPosts">
-          Convert Form GETs To POSTs
-        </li>
-        <li class="list-group-item text-link" data-form="convertFormPostsToGets">
-          Convert Form POSTs To GETs
-        </li>
-        <li class="list-group-item text-link" data-form="convertSelectElementsToTextInputs">
-          Convert Select Elements To Text Inputs
-        </li>
-
-        <li class="list-group-item text-link" data-form="convertTextInputsToTextareas">
-          Convert Text Inputs To Textareas
-        </li>
-        <li class="list-group-item text-link" data-form="displayFormDetails">
-          Display Form Details
-        </li>
-        <li class="list-group-item text-link" data-form="displayPasswords">
-          Display Passwords
-        </li>
-        <li class="list-group-item text-link" data-form="enableAutoCompletion">
-          Enable Auto Completion
-        </li>
-        <li class="list-group-item text-link" data-form="enableFormFields">
-          Enable Form Fields
-        </li>
-        <li class="list-group-item text-link" data-form="expandSelectElements">
-          Expand Select Elements
-        </li>
-
-        <li class="list-group-item text-link" data-form="makeFormFieldsWritable">
-          Make Form Fields Writable
-        </li>
-        <li class="list-group-item text-link" data-form="outlineFormFieldsWithoutLabels">
-          Outline Form Fields Without Labels
-        </li>
-        <li class="list-group-item text-link" data-form="populateFormFields">
-          Populate Form Fields
-        </li>
-        <li class="list-group-item text-link" data-form="removeFormValidation">
-          Remove Form Validation
-        </li>
-        <li class="list-group-item text-link" data-form="removeMaximumLengths">
-          Remove Maximum Lengths
-        </li>
-        <li class="list-group-item text-link" data-form="viewFormInformation">
-          View Form Information
-        </li>
+        <li class="list-group-item text-link" data-form="displayFormDetails">display form details</li>
+        <li class="list-group-item text-link" data-form="displayPasswords">display passwords</li>
+        <li class="list-group-item text-link" data-form="enableAutoCompletion">enable auto completion</li>
+        <li class="list-group-item text-link" data-form="enableFormFields">enable form fields</li>
+        <li class="list-group-item text-link" data-form="expandSelectElements">expand select elements</li>
+        <li class="list-group-item text-link" data-form="makeFormFieldsWritable">make form fields writable</li>
+        <li class="list-group-item text-link" data-form="outlineFormFieldsWithoutLabels">outline form fields without
+          labels</li>
+        <li class="list-group-item text-link" data-form="populateFormFields">populate form fields</li>
+        <li class="list-group-item text-link" data-form="removeFormValidation">remove form validation</li>
+        <li class="list-group-item text-link" data-form="removeMaximumLengths">remove maximum lengths</li>
+        <li class="list-group-item text-link" data-form="viewFormInformation">view form information</li>
       </ul>
     </div>
 
@@ -438,25 +345,22 @@
     <div class="tab-panel d-none" data-category="resize">
       <ul class="list-group list-group-flush" id="resizeActions">
         <li class="list-group-item text-link" data-resize="displayWindowSize">
-          Display Window Size
-        </li>
-        <li class="list-group-item text-link" data-resize="resizeWindow">
-          Resize Window...
+          display window size
         </li>
         <li class="list-group-item text-link" data-resize="resizePreset" data-width="1024" data-height="768">
           1024x768
         </li>
         <li class="list-group-item text-link" data-resize="editResizeDimensions">
-          Edit Resize Dimensions...
+          edit resize dimensions...
         </li>
         <li class="list-group-item text-link" data-resize="viewResponsiveLayouts">
-          View Responsive Layouts
+          view responsive layouts
         </li>
       </ul>
 
       <!-- ✅ Resize form (hidden by default) -->
       <div id="resizeForm" class="d-none border p-2 rounded mt-2">
-        <h6 class="mb-2">Resize Current Window</h6>
+        <h6 class="mb-2">resize current window</h6>
 
         <div class="d-flex gap-2 mb-2">
           <input id="resizeWidth" type="number" class="form-control" placeholder="Width (px)" min="200" />
@@ -464,8 +368,8 @@
         </div>
 
         <div class="d-flex gap-2">
-          <button id="resizeApply" class="btn btn-sm btn-primary">Apply</button>
-          <button id="resizeCancel" class="btn btn-sm btn-secondary">Cancel</button>
+          <button id="resizeApply" class="btn btn-sm btn-primary">apply</button>
+          <button id="resizeCancel" class="btn btn-sm btn-secondary">cancel</button>
         </div>
       </div>
     </div>
@@ -473,64 +377,93 @@
     <!-- Tools -->
     <div class="tab-panel d-none" data-category="tools">
       <ul class="list-group list-group-flush">
-        <li class="list-group-item text-link">Validate CSS</li>
-        <li class="list-group-item text-link">Validate Feed</li>
-        <li class="list-group-item text-link">Validate HTML</li>
-        <li class="list-group-item text-link">Validate Accessibility</li>
-        <li class="list-group-item text-link">Validate Links</li>
-        <li class="list-group-item text-link">Validate Structured Data</li>
-        <li class="list-group-item text-link">View DNS Records</li>
-        <!-- <li class="list-group-item text-link">Edit Tools...</li> -->
-        <li class="list-group-item text-link">Validate Local CSS</li>
-        <li class="list-group-item text-link">Validate Local HTML</li>
-        <li class="list-group-item text-link">View Source</li>
+        <li class="list-group-item text-link">validate css</li>
+        <li class="list-group-item text-link">validate feed</li>
+        <li class="list-group-item text-link">validate html</li>
+        <li class="list-group-item text-link">validate accessibility</li>
+        <li class="list-group-item text-link">validate links</li>
+        <li class="list-group-item text-link">validate structured data</li>
+        <li class="list-group-item text-link">view dns records</li>
+        <li class="list-group-item text-link">validate local css</li>
+        <li class="list-group-item text-link">validate local html</li>
+        <li class="list-group-item text-link">view source</li>
+      </ul>
+    </div>
+    
+    <!-- miscellaneous -->
+    <div class="tab-panel d-none" data-category="miscellaneous">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item text-link" data-miscellaneous="clearCache">clear cache</li>
+        <li class="list-group-item text-link" data-miscellaneous="clearHistory">clear history</li>
+        <li class="list-group-item text-link" data-miscellaneous="displayColorPicker">display color picker</li>
+        <li class="list-group-item text-link" data-miscellaneous="displayHiddenElements">display hidden elements</li>
+        <li class="list-group-item text-link" data-miscellaneous="displayLineGuides">display line guides</li>
+        <li class="list-group-item text-link" data-miscellaneous="displayRuler">display ruler</li>
+        <li class="list-group-item text-link" data-miscellaneous="linearizePage">linearize page</li>
+        <li class="list-group-item text-link" data-miscellaneous="makeFramesResizable">make frames resizable</li>
       </ul>
     </div>
 
-    <!-- Miscellaneous -->
-    <div class="tab-panel d-none" data-category="miscellaneous">
+    <!-- seo -->
+    <div class="tab-panel d-none" data-category="seo">
       <ul class="list-group list-group-flush">
-        <li class="list-group-item text-link">Clear Cache</li>
-        <li class="list-group-item text-link">Clear History</li>
-        <li class="list-group-item text-link">Display Color Picker</li>
-        <li class="list-group-item text-link">Display Hidden Elements</li>
-        <li class="list-group-item text-link">Display Line Guides</li>
-        <li class="list-group-item text-link">Display Ruler</li>
-        <li class="list-group-item text-link">Linearize Page</li>
-        <li class="list-group-item text-link">Make Frames Resizable</li>
-        <li class="list-group-item text-link">Mark All Links Unvisited</li>
-        <li class="list-group-item text-link">Mark All Links Visited</li>
+        <li class="list-group-item text-link">check meta tags</li>
+        <li class="list-group-item text-link">check headings</li>
+        <li class="list-group-item text-link">check canonical</li>
+        <li class="list-group-item text-link">check robots</li>
+        <li class="list-group-item text-link">check structured data</li>
+        <li class="list-group-item text-link">check alt attributes</li>
+        <li class="list-group-item text-link">check links</li>
+        <li class="list-group-item text-link">check title length</li>
+        <li class="list-group-item text-link">check description length</li>
+        <li class="list-group-item text-link">check hreflang</li>
+        <li class="list-group-item text-link">check sitemap</li>
+        <li class="list-group-item text-link">check favicon</li>
+        <li class="list-group-item text-link">check open graph</li>
+        <li class="list-group-item text-link">check twitter cards</li>
+        <li class="list-group-item text-link">check html lang</li>
       </ul>
     </div>
+
     <!-- Clear History Confirm -->
     <div id="clearHistoryConfirm" class="d-none" style="
-  margin-top:10px;
-  padding:12px;
-  border:1px solid rgba(0,0,0,.15);
-  border-radius:12px;
-  background:#fff;
-  box-shadow:0 6px 18px rgba(0,0,0,.12);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-">
+      margin-top:10px;
+      padding:12px;
+      border:1px solid rgba(0,0,0,.15);
+      border-radius:12px;
+      background:#fff;
+      box-shadow:0 6px 18px rgba(0,0,0,.12);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    ">
       <div style="font-weight:600; margin-bottom:8px;">
-        Are you sure you want to clear the history?
+        are you sure you want to clear the history?
       </div>
 
       <div style="display:flex; gap:8px; justify-content:flex-end;">
-        <button id="clearHistoryCancel" class="btn btn-light">Cancel</button>
-        <button id="clearHistoryConfirmBtn" class="btn btn-danger">Clear</button>
+        <button id="clearHistoryCancel" class="btn btn-light">cancel</button>
+        <button id="clearHistoryConfirmBtn" class="btn btn-danger">clear</button>
       </div>
     </div>
+    <div class="reset-notification-wrapper">
+      <!-- Notification container (empty, JS will populate it) -->
+      <div class="notification-container" id="global-notification-container"></div>
 
+      <!-- Reset + Undo -->
+      <div class="reset-undo-container">
+        <span class="list-group-item text-link" data-disable="resetAll">reset</span>
+        <button class="btn btn-sm undo-btn">undo</button>
+      </div>
+
+    </div>
   </div>
 
   <link rel="stylesheet" href="bootstrap/bootstrap.css" />
   <script src="bootstrap/bootstrap.js"></script>
   <script src="js/toolsFunctions.js"></script>
   <script src="js/miscellaneousFunctions.js"></script>
-  <script type="module" src="js/main.js"></script>
+  <script src="js/seoFunctions.js"></script>
+  <script src="js/main.js"></script>
   <script src="js/tabs.js"></script>
-  <script src="popup.js"></script>
 </body>
 
 </html>

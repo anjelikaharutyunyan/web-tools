@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "web tools",
-    "version": "1.122.2",
+    "version": "2.142.2",
     "description": "Developer extension with global cookie control",
     "default_locale": "en",
     "permissions": [
@@ -29,9 +29,21 @@
                 "<all_urls>"
             ],
             "js": [
+                "js/content-bridge.js"
+            ],
+            "run_at": "document_start",
+            "world": "ISOLATED",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
                 "js/cookiesFunctions.js"
             ],
             "run_at": "document_idle",
+            "world": "ISOLATED",
             "all_frames": true
         },
         {
@@ -42,7 +54,107 @@
                 "js/cssFunctions.js"
             ],
             "run_at": "document_end",
+            "world": "ISOLATED",
             "all_frames": false
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/disableFunctions.js"
+            ],
+            "run_at": "document_start",
+            "world": "MAIN",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/imageFunctions.js"
+            ],
+            "run_at": "document_end",
+            "world": "MAIN",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/informationFunctions.js"
+            ],
+            "run_at": "document_end",
+            "world": "MAIN",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/outlineFunctions.js"
+            ],
+            "run_at": "document_end",
+            "world": "MAIN",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/formsFunctions.js"
+            ],
+            "run_at": "document_end",
+            "world": "MAIN",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/seoFunctions.js"
+            ],
+            "run_at": "document_idle",
+            "world": "MAIN",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/toolsFunctions.js"
+            ],
+            "run_at": "document_idle",
+            "world": "MAIN",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/weightInformation.js"
+            ],
+            "run_at": "document_idle",
+            "world": "MAIN",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/miscellaneousFunctions.js"
+            ],
+            "run_at": "document_idle",
+            "world": "MAIN",
+            "all_frames": true
         }
     ],
     "action": {
